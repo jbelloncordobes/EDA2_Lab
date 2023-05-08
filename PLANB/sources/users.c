@@ -39,6 +39,10 @@ user* createUser(){
     birthday:
     printf("\nCumpleanyos\n");
     printf("\nAno:\n");
+    //while (scanf("%d", &year)!=1){
+        //printf("Introduce un ano valido");
+        //ungetc(year, stdin);
+    //};
     scanf("%d", &year);
     if (year > time.tm_year+1900 || year < 1900){
         printf("Introduce un ano valido");
