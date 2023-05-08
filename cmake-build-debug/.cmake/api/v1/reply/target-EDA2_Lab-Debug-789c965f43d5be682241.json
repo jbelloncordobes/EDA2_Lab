@@ -70,7 +70,7 @@
 				"role" : "flags"
 			},
 			{
-				"fragment" : "-mwindows -municode",
+				"fragment" : "-mwindows -municode -mconsole",
 				"role" : "flags"
 			},
 			{

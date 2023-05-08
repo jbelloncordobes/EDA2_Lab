@@ -71,7 +71,7 @@ build CMakeFiles/EDA2_Lab.dir/sources/interface.c.obj: C_COMPILER__EDA2_Lab_Debu
 
 build EDA2_Lab.exe: C_EXECUTABLE_LINKER__EDA2_Lab_Debug CMakeFiles/EDA2_Lab.dir/main.c.obj CMakeFiles/EDA2_Lab.dir/sources/interface.c.obj
   FLAGS = -g
-  LINK_FLAGS = -mwindows -municode
+  LINK_FLAGS = -mwindows -municode -mconsole
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\EDA2_Lab.dir
   POST_BUILD = cd .
