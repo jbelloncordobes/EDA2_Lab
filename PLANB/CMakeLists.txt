@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.24)
+project(PLANB C)
+
+set(CMAKE_C_STANDARD 11)
+
+add_executable(PLANB main.c headers/common.h sources/users.c headers/users.h)

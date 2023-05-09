@@ -1,0 +1,3 @@
+C:/Users/Hp/Documents/EDA2/EDA2_Lab/PLANB/cmake-build-debug/CMakeFiles/PLANB.dir
+C:/Users/Hp/Documents/EDA2/EDA2_Lab/PLANB/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Hp/Documents/EDA2/EDA2_Lab/PLANB/cmake-build-debug/CMakeFiles/rebuild_cache.dir
