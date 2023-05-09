@@ -163,7 +163,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             hUsers = NULL;
 
             AddMenu(hwnd);
-//            LoadWindow(hwnd);
+            LoadWindow(hwnd);
             return 0;
         case WM_CLOSE:
             //if (MessageBox(hwnd, L"Really quit?", L"My application", MB_OKCANCEL) == IDOK)
@@ -228,8 +228,8 @@ void LoadWindow(HWND hwnd){
     CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 250, 0, 500, 700, hwnd, NULL, NULL, NULL);
     CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 750, 0, 250, 700, hwnd, NULL, NULL, NULL);
 
-//    CreateWindowExW(0, L"static", L"Chat vacío", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 250, 0, 500, 600, hwnd, NULL, NULL, NULL);
-//    hWriteMessage = CreateWindowExW(0, L"edit", L"Selecciona un chat y escribe un mensaje", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 250, 600, 500, 100, hwnd, NULL, NULL, NULL);
+    CreateWindowExW(0, L"static", L"Chat vacío", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 250, 0, 500, 600, hwnd, NULL, NULL, NULL);
+    hWriteMessage = CreateWindowExW(0, L"edit", L"Selecciona un chat y escribe un mensaje", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 250, 600, 500, 100, hwnd, NULL, NULL, NULL);
 
     CreateWindowExW(0, L"static", L"Todos los usuarios", WS_VISIBLE | WS_CHILD | SS_CENTER, 0, 0, 250, 16, hwnd, NULL, NULL, NULL);
 
