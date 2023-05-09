@@ -120,7 +120,7 @@ user* createUser(){
     return newuser;
 }
 
-void addUser(user** array, user* newuser, int *userlength){
+/*void addUser(user** array, user* newuser, int *userlength){
     if (array == NULL){
         array = malloc(sizeof(user));
     } else {
@@ -128,12 +128,37 @@ void addUser(user** array, user* newuser, int *userlength){
     }
     array[*userlength] = newuser;
     *userlength += 1;
+}*/
+
+void addUser(nodelist* array, user* newuser){
+    unode *n = malloc(sizeof(unode));
+    n->User = newuser;
+    if (array == NULL) {
+        array = malloc(sizeof(nodelist));
+        array->first = n;
+    }
+    else{
+        array->last->next = n;
+    }
+    array->last = n;
+    n->next = NULL;
 }
 
-void listUsers(user** array, int userlength){
+
+/*void listUsers(user** array, int userlength){
     printf("Estos son todos los usuarios: \n");
     for(int i = 0; i < userlength; i++){
         printf("%s\n", array[i]->username);
+    }
+    printf("\n");
+}*/
+
+void listUsers(nodelist* array){
+    printf("Estos son todos los usuarios: \n");
+    unode *n = array->first;
+    while(n!=NULL){
+        printf("%s\n", n->User->username);
+        n = n->next;
     }
     printf("\n");
 }

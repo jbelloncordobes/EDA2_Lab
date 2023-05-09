@@ -9,8 +9,9 @@ int main() {
 }
 
 void menu(){
-    int userlength = 0;
-    user** Users = NULL;
+    //int userlength = 0;
+    //user** Users = NULL;
+    nodelist *Users = NULL;
     int serial = 0;
     char answer[2];
     int decision;
@@ -29,11 +30,13 @@ void menu(){
         switch (decision) {
             case 1: {
                 user* newuser = createUser();
-                addUser(Users, newuser, &userlength);
+                //addUser(Users, newuser, &userlength);
+                addUser(Users, newuser);
             }
             break;
             case 2:
-                listUsers(Users, userlength);
+                //listUsers(Users, userlength);
+                listUsers(Users);
             break;
             case 4:
                 return;
