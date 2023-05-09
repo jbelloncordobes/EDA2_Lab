@@ -36,38 +36,49 @@ user* createUser(){
     int month;
     int day;
     struct tm time = getCurrentDate();
-    birthday:
+
     printf("\nCumpleanyos\n");
     printf("\nAno:\n");
-    //while (scanf("%d", &year)!=1){
-        //printf("Introduce un ano valido");
-        //ungetc(year, stdin);
-    //};
-    scanf("%d", &year);
+    yyear:
+    while (scanf("%d", &year)!=1){
+        printf("Introduce un ano valido:\n");
+        fflush(stdin);
+    }
+
     if (year > time.tm_year+1900 || year < 1900){
-        printf("Introduce un ano valido");
-        goto birthday;
+        printf("Introduce un ano valido:\n");
+        goto yyear;
     }
-    printf("\nMes (en numero):\n");
-    scanf("%d", &month);
+
+    printf("Mes (en numero):\n");
+    mmonth:
+    while (scanf("%d", &month)!=1){
+        printf("Introduce un mes valido:\n");
+        fflush(stdin);
+    }
     if (month > 12 || month < 1){
-        printf("Mes invalido");
-        goto birthday;
+        printf("Introduce un mes valido:");
+        goto mmonth;
     }
-    printf("\nDia:\n");
-    scanf("%d", &day);
+
+    printf("Dia (en numero):\n");
+    dday:
+    while (scanf("%d", &day)!=1){
+        printf("Introduce un dia valido:\n");
+        fflush(stdin);
+    }
     if (day > 28){
         if (month == 2){
             if (!(year % 4 && (year % 100 != 0 || year % 400 == 0))){
-                printf("Día invalido");
-                goto birthday;
+                printf("Introduce un dia valido:\n");
+                goto dday;
             }
         }
     }
     if (day == 31){
         if (month == 2 || month == 4 || month == 6 || month == 9 || month == 11){
-            printf("Día invalido");
-            goto birthday;
+            printf("Introduce un dia valido:\n");
+            goto dday;
         }
     }
 
