@@ -16,7 +16,21 @@ typedef struct user{
     char hobbies[MAX_HOBBIES][MAX_LENGTH];
 } user;
 
+typedef struct Node{
+    user *User;
+    struct Node *next;
+}unode;
+
+typedef struct NodeList{
+    unode *first;
+    unode *last;
+}nodelist;
+
 user* createUser();
-void addUser(user**, user*, int*);
-void listUsers(user**, int);
+//void addUser(user**, user*, int*);
+void addUser(nodelist*, user*);
+
+//void listUsers(user**, int);
+void listUsers(nodelist*);
+
 #endif //PLANB_USERS_H

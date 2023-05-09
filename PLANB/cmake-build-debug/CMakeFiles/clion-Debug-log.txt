@@ -1,10 +1,10 @@
-C:\IDE\CLion\bin\cmake\win\x64\bin\cmake.exe -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - MinGW Makefiles" -S C:\Users\u215109\CLionProjects\EDA2_Lab\PLANB -B C:\Users\u215109\CLionProjects\EDA2_Lab\PLANB\cmake-build-debug
+"D:\Programs\CLion 2022.3.2\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - MinGW Makefiles" -S "G:\Didac\Universitat\EDA II\EDA2_Lab\PLANB" -B "G:\Didac\Universitat\EDA II\EDA2_Lab\PLANB\cmake-build-debug"
 -- The C compiler identification is GNU 11.2.0
 -- Detecting C compiler ABI info
 -- Detecting C compiler ABI info - done
--- Check for working C compiler: C:/IDE/CLion/bin/mingw/bin/gcc.exe - skipped
+-- Check for working C compiler: D:/Programs/CLion 2022.3.2/bin/mingw/bin/gcc.exe - skipped
 -- Detecting C compile features
 -- Detecting C compile features - done
 -- Configuring done
 -- Generating done
--- Build files have been written to: C:/Users/u215109/CLionProjects/EDA2_Lab/PLANB/cmake-build-debug
+-- Build files have been written to: G:/Didac/Universitat/EDA II/EDA2_Lab/PLANB/cmake-build-debug
