@@ -1,3 +1,0 @@
-G:/Didac/Universitat/EDA II/EDA2_Lab/PLANB/cmake-build-debug/CMakeFiles/PLANB.dir
-G:/Didac/Universitat/EDA II/EDA2_Lab/PLANB/cmake-build-debug/CMakeFiles/edit_cache.dir
-G:/Didac/Universitat/EDA II/EDA2_Lab/PLANB/cmake-build-debug/CMakeFiles/rebuild_cache.dir
