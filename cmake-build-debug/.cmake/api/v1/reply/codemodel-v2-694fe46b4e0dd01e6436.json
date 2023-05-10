@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "G:/Didac/Universitat/EDA II/EDA2_Lab/PLANB/cmake-build-debug",
-		"source" : "G:/Didac/Universitat/EDA II/EDA2_Lab/PLANB"
+		"build" : "C:/Users/Hp/Documents/EDA2/Terminal/EDA2_Lab/cmake-build-debug",
+		"source" : "C:/Users/Hp/Documents/EDA2/Terminal/EDA2_Lab"
 	},
 	"version" : 
 	{

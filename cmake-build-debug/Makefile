@@ -47,19 +47,19 @@ cmake_force:
 SHELL = cmd.exe
 
 # The CMake executable.
-CMAKE_COMMAND = "C:\Program Files\JetBrains\CLion 2022.3.1\bin\cmake\win\bin\cmake.exe"
+CMAKE_COMMAND = "D:\Programs\CLion 2022.3.2\bin\cmake\win\x64\bin\cmake.exe"
 
 # The command to remove a file.
-RM = "C:\Program Files\JetBrains\CLion 2022.3.1\bin\cmake\win\bin\cmake.exe" -E rm -f
+RM = "D:\Programs\CLion 2022.3.2\bin\cmake\win\x64\bin\cmake.exe" -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\Hp\Documents\EDA2\Terminal\EDA2_Lab
+CMAKE_SOURCE_DIR = "G:\Didac\Universitat\EDA II\EDA2_Lab\PLANB"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\Hp\Documents\EDA2\Terminal\EDA2_Lab\cmake-build-debug
+CMAKE_BINARY_DIR = "G:\Didac\Universitat\EDA II\EDA2_Lab\PLANB\cmake-build-debug"
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -67,7 +67,7 @@ CMAKE_BINARY_DIR = C:\Users\Hp\Documents\EDA2\Terminal\EDA2_Lab\cmake-build-debu
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	"C:\Program Files\JetBrains\CLion 2022.3.1\bin\cmake\win\bin\cmake.exe" -E echo "No interactive CMake dialog available."
+	"D:\Programs\CLion 2022.3.2\bin\cmake\win\x64\bin\cmake.exe" -E echo "No interactive CMake dialog available."
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -77,7 +77,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	"C:\Program Files\JetBrains\CLion 2022.3.1\bin\cmake\win\bin\cmake.exe" --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	"D:\Programs\CLion 2022.3.2\bin\cmake\win\x64\bin\cmake.exe" --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -86,9 +86,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Hp\Documents\EDA2\Terminal\EDA2_Lab\cmake-build-debug\CMakeFiles C:\Users\Hp\Documents\EDA2\Terminal\EDA2_Lab\cmake-build-debug\\CMakeFiles\progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start "G:\Didac\Universitat\EDA II\EDA2_Lab\PLANB\cmake-build-debug\CMakeFiles" "G:\Didac\Universitat\EDA II\EDA2_Lab\PLANB\cmake-build-debug\\CMakeFiles\progress.marks"
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Hp\Documents\EDA2\Terminal\EDA2_Lab\cmake-build-debug\CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "G:\Didac\Universitat\EDA II\EDA2_Lab\PLANB\cmake-build-debug\CMakeFiles" 0
 .PHONY : all
 
 # The main clean target
@@ -116,24 +116,24 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named EDA2_Lab
+# Target rules for targets named PLANB
 
 # Build rule for target.
-EDA2_Lab: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 EDA2_Lab
-.PHONY : EDA2_Lab
+PLANB: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 PLANB
+.PHONY : PLANB
 
 # fast build rule for target.
-EDA2_Lab/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\EDA2_Lab.dir\build.make CMakeFiles/EDA2_Lab.dir/build
-.PHONY : EDA2_Lab/fast
+PLANB/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\PLANB.dir\build.make CMakeFiles/PLANB.dir/build
+.PHONY : PLANB/fast
 
 main.obj: main.c.obj
 .PHONY : main.obj
 
 # target to build an object file
 main.c.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\EDA2_Lab.dir\build.make CMakeFiles/EDA2_Lab.dir/main.c.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\PLANB.dir\build.make CMakeFiles/PLANB.dir/main.c.obj
 .PHONY : main.c.obj
 
 main.i: main.c.i
@@ -141,7 +141,7 @@ main.i: main.c.i
 
 # target to preprocess a source file
 main.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\EDA2_Lab.dir\build.make CMakeFiles/EDA2_Lab.dir/main.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\PLANB.dir\build.make CMakeFiles/PLANB.dir/main.c.i
 .PHONY : main.c.i
 
 main.s: main.c.s
@@ -149,32 +149,32 @@ main.s: main.c.s
 
 # target to generate assembly for a file
 main.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\EDA2_Lab.dir\build.make CMakeFiles/EDA2_Lab.dir/main.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\PLANB.dir\build.make CMakeFiles/PLANB.dir/main.c.s
 .PHONY : main.c.s
 
-sources/interface.obj: sources/interface.c.obj
-.PHONY : sources/interface.obj
+sources/users.obj: sources/users.c.obj
+.PHONY : sources/users.obj
 
 # target to build an object file
-sources/interface.c.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\EDA2_Lab.dir\build.make CMakeFiles/EDA2_Lab.dir/sources/interface.c.obj
-.PHONY : sources/interface.c.obj
+sources/users.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\PLANB.dir\build.make CMakeFiles/PLANB.dir/sources/users.c.obj
+.PHONY : sources/users.c.obj
 
-sources/interface.i: sources/interface.c.i
-.PHONY : sources/interface.i
+sources/users.i: sources/users.c.i
+.PHONY : sources/users.i
 
 # target to preprocess a source file
-sources/interface.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\EDA2_Lab.dir\build.make CMakeFiles/EDA2_Lab.dir/sources/interface.c.i
-.PHONY : sources/interface.c.i
+sources/users.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\PLANB.dir\build.make CMakeFiles/PLANB.dir/sources/users.c.i
+.PHONY : sources/users.c.i
 
-sources/interface.s: sources/interface.c.s
-.PHONY : sources/interface.s
+sources/users.s: sources/users.c.s
+.PHONY : sources/users.s
 
 # target to generate assembly for a file
-sources/interface.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\EDA2_Lab.dir\build.make CMakeFiles/EDA2_Lab.dir/sources/interface.c.s
-.PHONY : sources/interface.c.s
+sources/users.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\PLANB.dir\build.make CMakeFiles/PLANB.dir/sources/users.c.s
+.PHONY : sources/users.c.s
 
 # Help Target
 help:
@@ -184,13 +184,13 @@ help:
 	@echo ... depend
 	@echo ... edit_cache
 	@echo ... rebuild_cache
-	@echo ... EDA2_Lab
+	@echo ... PLANB
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s
-	@echo ... sources/interface.obj
-	@echo ... sources/interface.i
-	@echo ... sources/interface.s
+	@echo ... sources/users.obj
+	@echo ... sources/users.i
+	@echo ... sources/users.s
 .PHONY : help
 
 
