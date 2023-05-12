@@ -11,10 +11,13 @@ int main() {
 void menu(){
     //int userlength = 0;
     //user** Users = NULL;
-    nodelist *Users = NULL;
+
     int serial = 0;
     char answer[2];
     int decision;
+    nodelist *Users = malloc(sizeof(nodelist));
+    Users->first = NULL;
+    Users->last = NULL;
 
     while(TRUE){
         printf("Que quieres hacer?\n");

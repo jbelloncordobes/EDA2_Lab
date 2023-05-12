@@ -6,28 +6,24 @@
 #include "../headers/users.h"
 
 user* createUser(){
-    char username[MAX_LENGTH];
-    char email[MAX_LENGTH];
-    char birthday[MAX_LENGTH];
-    char location[MAX_LENGTH];
-    char hobbies[5][MAX_LENGTH];
+    user* newuser = malloc(sizeof(user));
 
     username:
     printf("\nNombre del usuario: \n");
-    scanf("%s", username);
-    if (strlen(username) < 1){
+    scanf("%s", newuser->username);
+    if (strlen(newuser->username) < 1){
         printf("El nombre de usuario no puede estar vacio\n");
         goto username;
     }
 
     email:
     printf("\nEmail: \n");
-    scanf("%s", email);
+    scanf("%s", newuser->email);
     for(int i = 0; i < MAX_LENGTH; i++){
-        if (email[i] == '@'){
+        if (newuser->email[i] == '@'){
             break;
         }
-        if (email[i] == 0) {
+        if (newuser->email[i] == 0) {
             printf("Formato de email incorrecto");
             goto email;
         }
@@ -85,35 +81,34 @@ user* createUser(){
     char buffer[21];
 
     itoa(year, buffer, 10);
-    strcpy(birthday, (const char *) &buffer);
-    strcat(birthday, "/");
+    strcpy(newuser->birthday, (const char *) &buffer);
+    strcat(newuser->birthday, "/");
 
     itoa(month, buffer, 10);
-    strcat(birthday, (const char *) &buffer);
-    strcat(birthday, "/");
+    strcat(newuser->birthday, (const char *) &buffer);
+    strcat(newuser->birthday, "/");
 
     itoa(day, buffer, 10);
-    strcat(birthday, (const char *) &buffer);
+    strcat(newuser->birthday, (const char *) &buffer);
 
     location:
     printf("\nUbicacion:\n");
-    scanf("%s", location);
+    scanf("%s", newuser->location);
 
     hobbies:
     printf("\nEscribe tus 5 gustos o preferencias\n");
     for (int i = 0; i < 5; i++){
         printf("%d:\n", i+1);
-        scanf("%s", hobbies[i]);
+        scanf("%s", newuser->hobbies[i]);
     }
 
-    user* newuser = malloc(sizeof(user));
-    strcpy(newuser->username, username);
-    strcpy(newuser->email, email);
-    strcpy(newuser->birthday, birthday);
-    strcpy(newuser->location, location);
-    for(int i = 0; i < 5; i++){
-        strcpy(newuser->hobbies[i], hobbies[i]);
-    }
+//    strcpy(newuser->username, username);
+//    strcpy(newuser->email, email);
+//    strcpy(newuser->birthday, birthday);
+//    strcpy(newuser->location, location);
+//    for(int i = 0; i < 5; i++){
+//        strcpy(newuser->hobbies[i], hobbies[i]);
+//    }
 
 
     printf("\nUsuario Creado\n");
@@ -130,17 +125,16 @@ user* createUser(){
     *userlength += 1;
 }*/
 
-void addUser(nodelist* array, user* newuser){
+void addUser(nodelist* nlist, user* newuser){
     unode *n = malloc(sizeof(unode));
     n->User = newuser;
-    if (array == NULL) {
-        array = malloc(sizeof(nodelist));
-        array->first = n;
+    if (nlist->first == NULL) {
+        nlist->first = n;
     }
     else{
-        array->last->next = n;
+        nlist->last->next = n;
     }
-    array->last = n;
+    nlist->last = n;
     n->next = NULL;
 }
 
@@ -153,9 +147,9 @@ void addUser(nodelist* array, user* newuser){
     printf("\n");
 }*/
 
-void listUsers(nodelist* array){
+void listUsers(nodelist* nlist){
     printf("Estos son todos los usuarios: \n");
-    unode *n = array->first;
+    unode *n = nlist->first;
     while(n!=NULL){
         printf("%s\n", n->User->username);
         n = n->next;
