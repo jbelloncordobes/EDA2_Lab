@@ -1,14 +1,6 @@
 #define _UNICODE
 #define UNICODE
-#define MENU_NEW_USER 1
-#define BUTTON_CREATE_USER 2
-#define OPEN_CHAT 3
-#define CHANGE_USER 4
-#define SELECT_USER 5
 
-#define MAX_LENGTH 50
-#define MAX_HOBBIES 5
-#define MAX_USERS 10
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -17,31 +9,13 @@
 #include <tchar.h>
 #include <windowsx.h>
 #include <time.h>
+#include "headers/handleStack.h"
+#include "headers/common.h"
+#include "headers/users.h"
 
 #pragma comment(lib, "User32.lib")
 
-// Forward declarations
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
-void displayForm(HWND hwnd);
-void OnSize(HWND hwnd, UINT flag, int width, int height);
-void Paint(HWND hwnd);
-void AddMenu(HWND hwnd);
-void LoadWindow(HWND hwnd);
-void registerFormClass(HINSTANCE hInstance);
-int createUser(HWND hwnd);
-void OperateAs(HWND hwnd);
 
-// Structs
-typedef struct user{
-    int id;
-    wchar_t username[MAX_LENGTH];
-    wchar_t birthday[MAX_LENGTH];
-    wchar_t email[MAX_LENGTH];
-    wchar_t location[MAX_LENGTH];
-    wchar_t hobbies[MAX_HOBBIES][MAX_LENGTH];
-
-} user;
 
 // Global Handles
 HWND mainWindow;
@@ -52,17 +26,26 @@ HWND hFormEmail;
 HWND hFormLocation;
 HWND hFormHobbies;
 
-HWND hWriteMessage;
+//HWND hWriteMessage;
 HWND hChat;
+HWND hMessageBox;
 HWND hOperateAsButton;
 
+// Control variables
 int active_user;
 int serial;
 
+// Interface Control
+int w_width;
+int w_height;
+handleStack* AppStack;
+
+// Friends management
 user* friends[MAX_USERS];
 int friends_length;
 HWND hFriends[MAX_USERS];
 
+// Users management
 user* users;
 int users_length;
 HWND* hUsers;
@@ -155,36 +138,54 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             }
             return 0;
         case WM_CREATE:
+            // Global variables initialization
+            AppStack = initHandleStack();
             active_user = -1;
             friends_length = 0;
             users_length = 0;
             serial = 0;
             users = NULL;
             hUsers = NULL;
+            w_width = CW_USEDEFAULT;
+            w_height = CW_USEDEFAULT;
 
             AddMenu(hwnd);
-            LoadWindow(hwnd);
+//            LoadWindow(hwnd);
             return 0;
         case WM_CLOSE:
             //if (MessageBox(hwnd, L"Really quit?", L"My application", MB_OKCANCEL) == IDOK)
             {
+                printf("Closing");
                 DestroyWindow(hwnd);
             }
             // Else: User canceled. Do nothing.
             return 0;
-        case WM_DESTROY:
+        case WM_DESTROY:{
             PostQuitMessage(0);
             return 0;
+        }
         case WM_SIZE: {    // Handle window resizing
             int width = LOWORD(lParam);     // Macro to get the low-order word
             int height = HIWORD(lParam);    // Macro to get the high-order word
 
-            OnSize(hwnd, (UINT) wParam, width, height);
+            w_width = width;
+            w_height = height;
+
+            LoadWindow(hwnd);
+
+//            OnSize(hwnd, (UINT) wParam, width, height);
             return 0;
         }
         case WM_PAINT:
             Paint(hwnd);
             return 0;
+        case WM_GETMINMAXINFO:
+        {
+            // Tamaño mínimo de la pantalla
+            LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
+            lpMMI->ptMinTrackSize.x = 800;
+            lpMMI->ptMinTrackSize.y = 400;
+        }
     }
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
@@ -192,7 +193,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 void Paint(HWND hwnd){
     PAINTSTRUCT ps;
     HDC hdc = BeginPaint(hwnd, &ps);
-    printf("\nAAAAA\n");
     // CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 250, 0, 500, 700, hwnd, NULL, NULL, NULL);
 //    Rectangle(hdc, 250, 850, 0, 500);
     RECT rectangle = {250, 0, 700, 500};
@@ -222,25 +222,53 @@ void AddMenu(HWND hwnd){
 }
 
 void LoadWindow(HWND hwnd){
-    // Secciones improvisados
-    printf("\nBBBB\n");
-    CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 0, 0, 250, 700, hwnd, NULL, NULL, NULL);
-    CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 250, 0, 500, 700, hwnd, NULL, NULL, NULL);
-    CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 750, 0, 250, 700, hwnd, NULL, NULL, NULL);
+    // Secciones improvisadas
 
-    CreateWindowExW(0, L"static", L"Chat vacío", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 250, 0, 500, 600, hwnd, NULL, NULL, NULL);
-    hWriteMessage = CreateWindowExW(0, L"edit", L"Selecciona un chat y escribe un mensaje", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 250, 600, 500, 100, hwnd, NULL, NULL, NULL);
+    HWND currWindow = popHandle(AppStack);
+    while(currWindow != NULL){
+        DestroyWindow(currWindow);
+        currWindow = popHandle(AppStack);
+    }
 
-    CreateWindowExW(0, L"static", L"Todos los usuarios", WS_VISIBLE | WS_CHILD | SS_CENTER, 0, 0, 250, 16, hwnd, NULL, NULL, NULL);
+    int width_unit = (w_width)/12;
+//    CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 0, 0, 250, 700, hwnd, NULL, NULL, NULL);
+//    CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 250, 0, 500, 700, hwnd, NULL, NULL, NULL);
+//    CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 750, 0, 250, 700, hwnd, NULL, NULL, NULL);
+
+    HWND separator1 = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 0, 0, 2*width_unit, 700, hwnd, NULL, NULL, NULL);
+    HWND separator2 = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 2*width_unit, 0, 8*width_unit, 700, hwnd, NULL, NULL, NULL);
+    HWND separator3 = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 10*width_unit, 0, 2*width_unit, 700, hwnd, NULL, NULL, NULL);
+
+//    CreateWindowExW(0, L"static", L"Chat vacío", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 250, 0, 500, 600, hwnd, NULL, NULL, NULL);
+//    hWriteMessage = CreateWindowExW(0, L"edit", L"Selecciona un chat y escribe un mensaje", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 250, 600, 500, 100, hwnd, NULL, NULL, NULL);
+
+    CreateWindowExW(0, L"static", L"Chat vacío", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 0, 0, 8*width_unit, 600, separator2, NULL, NULL, NULL);
+    hChat = CreateWindowExW(0, L"edit", L"Selecciona un chat y escribe un mensaje", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 0, 600, 8*width_unit, 100, separator2, NULL, NULL, NULL);
+
+//    CreateWindowExW(0, L"static", L"Todos los usuarios", WS_VISIBLE | WS_CHILD | SS_CENTER, 0, 0, 250, 16, hwnd, NULL, NULL, NULL);
+
+    CreateWindowExW(0, L"static", L"Todos los usuarios", WS_VISIBLE | WS_CHILD | SS_CENTER, 0, 0, 2*width_unit, 16, separator1, NULL, NULL, NULL);
 
 
-    CreateWindowExW(0, L"Button", L"Operar como", WS_VISIBLE | WS_CHILD, 774, 24, 100, 30, hwnd, (HMENU) CHANGE_USER, NULL, NULL);
+//    CreateWindowExW(0, L"Button", L"Operar como", WS_VISIBLE | WS_CHILD, 774, 24, 100, 30, hwnd, (HMENU) CHANGE_USER, NULL, NULL);
+    CreateWindowExW(0, L"Button", L"Operar como", WS_VISIBLE | WS_CHILD, (2*width_unit)/6, 24, (2*(2*width_unit))/3, 30, separator3, (HMENU) CHANGE_USER, NULL, NULL);
+
+    addHandle(AppStack, separator1);
+    addHandle(AppStack, separator2);
+    addHandle(AppStack, separator3);
+//    addHandle(AppStack, &chatWindow);
+//    addHandle(AppStack, &chatBox);
+//    addHandle(AppStack, &users_title);
+//    addHandle(AppStack, &operateas_button);
 
 
     // Los botones de los usuarios
     for (int i = 0; i < users_length; i++){
-        hUsers[i] = CreateWindowExW(0, L"Button", users[i].username, WS_VISIBLE | WS_CHILD | SS_CENTER, 8, 24 + i*48 + i*8, 200, 48, hwnd,
-                                    (HMENU) OPEN_CHAT, NULL, NULL);
+//        hUsers[i] = CreateWindowExW(0, L"Button", users[i].username, WS_VISIBLE | WS_CHILD | SS_CENTER, 8, 24 + i*48 + i*8, 200, 48, separator1,
+//                                    (HMENU) OPEN_CHAT, NULL, NULL);
+        hUsers[i] = CreateWindowExW(0, L"Button", users[i].username, WS_VISIBLE | WS_CHILD | SS_CENTER, (2*(width_unit))/6, 24 + i*48 + i*8, (4*(width_unit))/3, 48, separator1,
+                                   (HMENU) OPEN_CHAT, NULL, NULL);
+
     }
 
 }
