@@ -17,6 +17,7 @@
 // Forward declarations
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
+LRESULT CALLBACK SeparatorProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void displayForm(HWND hwnd);
 void OnSize(HWND hwnd, UINT flag, int width, int height);
 void Paint(HWND hwnd);

@@ -46,9 +46,9 @@ int friends_length;
 HWND hFriends[MAX_USERS];
 
 // Users management
-user* users;
-int users_length;
-HWND* hUsers;
+
+nodelist users;
+//HWND* hUsers;
 
 // wWinMain is the name of the program entry point when using Windows.h. The w before any string or function means
 // the string is encoded using UTF-16 or the function encodes the parameters using UTF-16 instead of ANSI
@@ -142,10 +142,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             AppStack = initHandleStack();
             active_user = -1;
             friends_length = 0;
-            users_length = 0;
             serial = 0;
-            users = NULL;
-            hUsers = NULL;
+            users.first = NULL;
+            users.last = NULL;
+            users.size = 0;
             w_width = CW_USEDEFAULT;
             w_height = CW_USEDEFAULT;
 
@@ -251,7 +251,9 @@ void LoadWindow(HWND hwnd){
 
 
 //    CreateWindowExW(0, L"Button", L"Operar como", WS_VISIBLE | WS_CHILD, 774, 24, 100, 30, hwnd, (HMENU) CHANGE_USER, NULL, NULL);
+//    CreateWindowExW(0, L"Button", L"Operar como", WS_VISIBLE | WS_CHILD, 10*width_unit + (2*width_unit)/6, 24, (2*(2*width_unit))/3, 30, hwnd, (HMENU) CHANGE_USER, NULL, NULL);
     CreateWindowExW(0, L"Button", L"Operar como", WS_VISIBLE | WS_CHILD, (2*width_unit)/6, 24, (2*(2*width_unit))/3, 30, separator3, (HMENU) CHANGE_USER, NULL, NULL);
+//    SetWindowLongPtr(handle, GWLP_WNDPROC, (LONG_PTR)WindowProc);
 
     addHandle(AppStack, separator1);
     addHandle(AppStack, separator2);
@@ -263,22 +265,33 @@ void LoadWindow(HWND hwnd){
 
 
     // Los botones de los usuarios
-    for (int i = 0; i < users_length; i++){
+    unode *curruser = users.first;
+    for (int i = 0; i < users.size; i++){
 //        hUsers[i] = CreateWindowExW(0, L"Button", users[i].username, WS_VISIBLE | WS_CHILD | SS_CENTER, 8, 24 + i*48 + i*8, 200, 48, separator1,
 //                                    (HMENU) OPEN_CHAT, NULL, NULL);
-        hUsers[i] = CreateWindowExW(0, L"Button", users[i].username, WS_VISIBLE | WS_CHILD | SS_CENTER, (2*(width_unit))/6, 24 + i*48 + i*8, (4*(width_unit))/3, 48, separator1,
+//        hUsers[i] = CreateWindowExW(0, L"Button", users[i].username, WS_VISIBLE | WS_CHILD | SS_CENTER, (2*(width_unit))/6, 24 + i*48 + i*8, (4*(width_unit))/3, 48, separator1,
+//                                   (HMENU) OPEN_CHAT, NULL, NULL);
+
+        CreateWindowExW(0, L"Button", curruser->User->username, WS_VISIBLE | WS_CHILD | SS_CENTER, (2*(width_unit))/6, 24 + i*48 + i*8, (4*(width_unit))/3, 48, separator1,
                                    (HMENU) OPEN_CHAT, NULL, NULL);
 
+        curruser = curruser->next;
     }
 
 }
 
 void OperateAs(HWND hwnd){
+    printf("Test");
     HWND windowH = CreateWindowExW(0, L"DialogWindow", L"Choose a user", WS_VISIBLE | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 248, 480, hwnd, NULL, NULL, NULL);
 
-    for (int i = 0; i < users_length; i++){
-        hUsers[i] = CreateWindowExW(0, L"Button", users[i].username, WS_VISIBLE | WS_CHILD | SS_CENTER, 8, 24 + i*48 + i*8, 200, 48, windowH,
+    unode *curruser = users.first;
+    for (int i = 0; i < users.size; i++){
+//        hUsers[i] = CreateWindowExW(0, L"Button", users[i].username, WS_VISIBLE | WS_CHILD | SS_CENTER, 8, 24 + i*48 + i*8, 200, 48, windowH,
+//                                    (HMENU) SELECT_USER, NULL, NULL);
+        CreateWindowExW(0, L"Button", curruser->User->username, WS_VISIBLE | WS_CHILD | SS_CENTER, 8, 24 + i*48 + i*8, 200, 48, windowH,
                                     (HMENU) SELECT_USER, NULL, NULL);
+
+        curruser = curruser->next;
     }
 }
 
@@ -296,15 +309,17 @@ LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp){
                 case SELECT_USER:{
                     wchar_t username[MAX_LENGTH];
                     GetWindowTextW((HWND) lp, username, MAX_LENGTH);
-                    for(int i = 0; i < users_length; i++){
-                        if (wcscmp(users[i].username, username) == 0){
+                    unode *curruser = users.first;
+                    for(int i = 0; i < users.size; i++){
+                        if (wcscmp(curruser->User->username, username) == 0){
                             wchar_t text[MAX_LENGTH + 15] = L"User Selected: ";
-                            wcscat(text, users[i].username);
+                            wcscat(text, curruser->User->username);
 
                             MessageBox(hwnd, text, L"Information", MB_OK);
-                            active_user = users[i].id;
+                            active_user = curruser->User->id;
                             break;
                         }
+                        curruser = curruser->next;
                     }
                     if (active_user == -1){
                         MessageBox(hwnd, L"Couldn't Select User", L"Information", MB_OK);
@@ -368,7 +383,7 @@ void displayForm(HWND hwnd){
     hFormLocation = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | SS_CENTER, paddingx, paddingl+(Lheight*2)+Theight+marginline, Twidth, Theight, windowH, NULL, NULL, NULL);
 
     // Birthday
-    CreateWindowExW(0, L"static", L"Cumpleaños (YYYY/MM/DD)", WS_VISIBLE | WS_CHILD | SS_CENTER, paddingx+Lwidth+marginsides, paddingl+Lheight+Theight+marginline, Lwidth, Lheight, windowH, NULL, NULL, NULL);
+    CreateWindowExW(0, L"static", L"Cumpleaños (DD/MM/YYYY)", WS_VISIBLE | WS_CHILD | SS_CENTER, paddingx+Lwidth+marginsides, paddingl+Lheight+Theight+marginline, Lwidth, Lheight, windowH, NULL, NULL, NULL);
     hFormBirthday = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | SS_CENTER, paddingx+Lwidth+marginsides, paddingl+Lheight*2+Theight+marginline, Twidth, Theight, windowH, NULL, NULL, NULL);
 
     //Hobbies
@@ -398,55 +413,86 @@ int createUser(HWND hwnd){
             break;
         }
         if (email[i] == 0) {
-            MessageBox(hwnd, L"Email format wrong", L"Information", MB_OK);
+            MessageBox(hwnd, L"Formato de mail incorrecto", L"Information", MB_OK);
             return FALSE;
         }
     }
 
-    if (birthday[4] != '/' || birthday[7] != '/'){
-        MessageBox(hwnd, L"Birthday format wrong", L"Information", MB_OK);
+    int year;
+    int month;
+    int day;
+
+    if (swscanf(birthday, L"%d/%d/%d", &day, &month, &year) < 3){
+        MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Information", MB_OK);
         return FALSE;
     }
 
-    users = realloc(users, (users_length + 1) * sizeof(user));
+    struct tm time = getCurrentDate();
 
-    int count = 0;
-    int hobbylength = 0;
-    wchar_t hobby[MAX_LENGTH];
-    for (int i = 0; i < MAX_LENGTH*5 && count < 5; i++, hobbylength++){
-        if(hobbies[i] == ','){
-            hobby[hobbylength] = 0;
-            wcscpy(users[users_length].hobbies[count], (const wchar_t *) &hobby);
-            count +=1;
-            hobbylength = 0;
-        } else if (hobbies[i] == 0){
-            hobby[hobbylength] = 0;
-            wcscpy(users[users_length].hobbies[count], (const wchar_t *) &hobby);
-            count += 1;
-            if (count < 5){
-                users = realloc(users, (users_length) * sizeof(user));
-                MessageBox(hwnd, L"Hobby format wrong", L"Information", MB_OK);
+    if (year > time.tm_year+1900 || year < 1900){
+        MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Information", MB_OK);
+        return FALSE;
+    }
+
+    if (month > 12 || month < 1){
+        MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Information", MB_OK);
+        return FALSE;
+    }
+
+    if (day > 28){
+        if (month == 2){
+            if (!(year % 4 && (year % 100 != 0 || year % 400 == 0))){
+                MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Information", MB_OK);
                 return FALSE;
             }
-        } else {
-            hobby[hobbylength] = hobbies[i];
+        }
+    }
+    if (day == 31){
+        if (month == 2 || month == 4 || month == 6 || month == 9 || month == 11){
+            MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Information", MB_OK);
+            return FALSE;
         }
     }
 
 
-    hUsers = realloc(hUsers, (users_length + 1) * sizeof(hwnd));
+    wchar_t hobby1[MAX_LENGTH];
+    wchar_t hobby2[MAX_LENGTH];
+    wchar_t hobby3[MAX_LENGTH];
+    wchar_t hobby4[MAX_LENGTH];
+    wchar_t hobby5[MAX_LENGTH];
+    int source = swscanf(hobbies, L"%[^,],%[^,],%[^,],%[^,],%[^,]", hobby1, hobby2, hobby3, hobby4, hobby5);
+    if (source < 5){
+        MessageBox(hwnd, L"Formato de gustos incorrecto/Menos de 5 gustos introducidos", L"Information", MB_OK);
+        return FALSE;
+    }
+    user *newuser = malloc(sizeof(user));
 
-    users[users_length].id = serial;
-    wcscpy(users[users_length].username, (const wchar_t *) &username);
-    wcscpy(users[users_length].username, (const wchar_t *) &username);
-    wcscpy(users[users_length].email, (const wchar_t *) &email);
-    wcscpy(users[users_length].birthday, (const wchar_t *) &birthday);
-    wcscpy(users[users_length].location, (const wchar_t *) &location);
+
+    newuser->id = serial;
+    wcscpy(newuser->username, (const wchar_t *) &username);
+    wcscpy(newuser->email, (const wchar_t *) &email);
+    wcscpy(newuser->birthday, (const wchar_t *) &birthday);
+    wcscpy(newuser->location, (const wchar_t *) &location);
+
+    wcscpy(newuser->hobbies[0], (const wchar_t *) &hobby1);
+    wcscpy(newuser->hobbies[1], (const wchar_t *) &hobby2);
+    wcscpy(newuser->hobbies[2], (const wchar_t *) &hobby3);
+    wcscpy(newuser->hobbies[3], (const wchar_t *) &hobby4);
+    wcscpy(newuser->hobbies[4], (const wchar_t *) &hobby5);
+
+    addUser(&users, newuser);
+    unode *newnode = malloc(sizeof(unode));
+    newnode->User = newuser;
 
     serial += 1;
-    users_length += 1;
+    users.size += 1;
 
     MessageBox(hwnd, L"User Created", L"Information", MB_OK);
 
     return TRUE;
+}
+
+LRESULT CALLBACK SeparatorProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }

@@ -19,20 +19,21 @@ typedef struct user{
     wchar_t email[MAX_LENGTH];
     wchar_t location[MAX_LENGTH];
     wchar_t hobbies[MAX_HOBBIES][MAX_LENGTH];
-
 } user;
 
 typedef struct Node{
     user *User;
     struct Node *next;
-}unode;
+} unode;
 
 typedef struct NodeList{
     unode *first;
     unode *last;
-}nodelist;
+    int size;
+} nodelist;
 
 // Forward Declarations
-
+struct tm getCurrentDate();
 void OperateAs(HWND hwnd);
+void addUser(nodelist* nlist, user* newuser);
 #endif //EDA2_LAB_USERS_H
