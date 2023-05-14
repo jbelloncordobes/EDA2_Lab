@@ -132,7 +132,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                     displayForm(hwnd);
                     break;
                 case CHANGE_USER:
-                    OperateAs(hwnd);
+                    OperateAs(hwnd, users);
                     break;
             }
             return 0;
@@ -227,7 +227,7 @@ void LoadWindow(HWND hwnd) {
         currWindow = popHandle(AppStack);
     }
 
-    int width_unit = (w_width) / 12;
+    int width_unit = ((w_width) / 12);
 
     // Separadores
     HWND separator1 = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 0, 0, 2 * width_unit, 700,
@@ -263,36 +263,25 @@ void LoadWindow(HWND hwnd) {
 
     // Los botones de los usuarios
     unode *curruser = users.first;
+    wchar_t name[MAX_LENGTH+5];
+    wchar_t character = '#';
+    int id;
+
     for (int i = 0; i < users.size; i++) {
 //        hUsers[i] = CreateWindowExW(0, L"Button", users[i].username, WS_VISIBLE | WS_CHILD | SS_CENTER, 8, 24 + i*48 + i*8, 200, 48, separator1,
 //                                    (HMENU) OPEN_CHAT, NULL, NULL);
 //        hUsers[i] = CreateWindowExW(0, L"Button", users[i].username, WS_VISIBLE | WS_CHILD | SS_CENTER, (2*(width_unit))/6, 24 + i*48 + i*8, (4*(width_unit))/3, 48, separator1,
 //                                   (HMENU) OPEN_CHAT, NULL, NULL);
+        id = curruser->User->id;
+        swprintf(name, sizeof(name) / sizeof(wchar_t), L"%ls%c%d", curruser->User->username, character, id);
 
-        CreateWindowExW(0, L"Button", curruser->User->username, WS_VISIBLE | WS_CHILD | SS_CENTER,
+        CreateWindowExW(0, L"Button", name, WS_VISIBLE | WS_CHILD | SS_CENTER,
                         (2 * (width_unit)) / 6, 24 + i * 48 + i * 8, (4 * (width_unit)) / 3, 48, separator1,
                         (HMENU) OPEN_CHAT, NULL, NULL);
 
         curruser = curruser->next;
     }
 
-}
-
-void OperateAs(HWND hwnd) {
-    printf("Test");
-    HWND windowH = CreateWindowExW(0, L"DialogWindow", L"Choose a user", WS_VISIBLE | WS_OVERLAPPEDWINDOW,
-                                   CW_USEDEFAULT, CW_USEDEFAULT, 248, 480, hwnd, NULL, NULL, NULL);
-
-    unode *curruser = users.first;
-    for (int i = 0; i < users.size; i++) {
-//        hUsers[i] = CreateWindowExW(0, L"Button", users[i].username, WS_VISIBLE | WS_CHILD | SS_CENTER, 8, 24 + i*48 + i*8, 200, 48, windowH,
-//                                    (HMENU) SELECT_USER, NULL, NULL);
-        CreateWindowExW(0, L"Button", curruser->User->username, WS_VISIBLE | WS_CHILD | SS_CENTER, 8,
-                        24 + i * 48 + i * 8, 200, 48, windowH,
-                        (HMENU) SELECT_USER, NULL, NULL);
-
-        curruser = curruser->next;
-    }
 }
 
 // // Defines the function that processes messages sent to the dialog (secondary) window
@@ -307,16 +296,21 @@ LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                     }
                     break;
                 case SELECT_USER: {
+                    // Se puede pasar esto a función en users.c
+                    wchar_t usernameid[MAX_LENGTH+5];
+                    GetWindowTextW((HWND) lp, usernameid, MAX_LENGTH);
                     wchar_t username[MAX_LENGTH];
-                    GetWindowTextW((HWND) lp, username, MAX_LENGTH);
+                    int id;
+                    swscanf(usernameid, L"%[^#]#%d", username, &id);
+                    printf("%d\n", id);
                     unode *curruser = users.first;
                     for (int i = 0; i < users.size; i++) {
-                        if (wcscmp(curruser->User->username, username) == 0) {
+                        if (curruser->User->id == id) {
                             wchar_t text[MAX_LENGTH + 15] = L"User Selected: ";
                             wcscat(text, curruser->User->username);
 
                             MessageBox(hwnd, text, L"Information", MB_OK);
-                            active_user = curruser->User->id;
+                            active_user = id;
                             break;
                         }
                         curruser = curruser->next;

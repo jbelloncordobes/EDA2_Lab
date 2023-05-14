@@ -34,6 +34,6 @@ typedef struct NodeList{
 
 // Forward Declarations
 struct tm getCurrentDate();
-void OperateAs(HWND hwnd);
+void OperateAs(HWND, nodelist);
 void addUser(nodelist* nlist, user* newuser);
 #endif //EDA2_LAB_USERS_H
