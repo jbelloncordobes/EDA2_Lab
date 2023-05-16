@@ -275,7 +275,7 @@ void LoadWindow(HWND hwnd) {
         swprintf(name, sizeof(name) / sizeof(wchar_t), L"%ls%c%d", curruser->User->username, character, id);
 
         CreateWindowExW(0, L"Button", name, WS_VISIBLE | WS_CHILD | SS_CENTER,
-                        (2 * (width_unit)) / 6, 24 + i * 48 + i * 8, (4 * (width_unit)) / 3, 48, separator1,
+                        (2 * (width_unit)) / 6, 24 + i * 48 + i * 8, (4 * (width_unit)) / 3, 48, hwnd,
                         (HMENU) OPEN_CHAT, NULL, NULL);
 
         curruser = curruser->next;
@@ -481,12 +481,12 @@ int createUser(HWND hwnd) {
     wcscpy(newuser->hobbies[3], (const wchar_t *) &hobby4);
     wcscpy(newuser->hobbies[4], (const wchar_t *) &hobby5);
 
-    newuser->friend_requests_sent = NULL;
-    newuser->friend_requests_received = NULL;
-    newuser->friends = NULL;
-    newuser->frr_size = 0;
-    newuser->frs_size = 0;
-    newuser->f_size = 0;
+    newuser->friend_requests_sent.size = 0;
+    newuser->friend_requests_sent.users = NULL;
+    newuser->friend_requests_received.size = 0;
+    newuser->friend_requests_received.users = NULL;
+    newuser->friends.size = 0;
+    newuser->friends.users = NULL;
 
     addUser(&users, newuser);
     unode *newnode = malloc(sizeof(unode));

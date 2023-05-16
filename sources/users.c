@@ -50,20 +50,20 @@ int sendFriendRequest(nodelist nlist, wchar_t friend_nameid[], wchar_t user_name
     }
 
 //    friend->friend_request_sent
-    add_to_queue(user->friend_requests_sent, &user->frs_size, friend);
-    add_to_queue(user->friend_requests_received, &user->frr_size, user);
+    add_to_queue(&user->friend_requests_sent, friend);
+    add_to_queue(&friend->friend_requests_received,user);
     return TRUE;
 }
 
-void add_to_queue(user **userarray, int *size, user* addeduser) {
-    if (size == 0) {
-        userarray = malloc(sizeof(user*));
+void add_to_queue(user_queue* queue, user* addeduser) {
+    if (queue->size == 0) {
+        queue->users = malloc(sizeof(user*));
     } else {
-        userarray = realloc(userarray, sizeof(user*) * (*size + 1));
+        queue->users = realloc(queue->users, sizeof(user*) * (queue->size + 1));
     }
 
-    userarray[*size] = addeduser;
-    *size += 1;
+    queue->users[queue->size] = addeduser;
+    queue->size += 1;
 }
 
 void OperateAs(HWND hwnd, nodelist users) {
