@@ -1,3 +1,0 @@
-C:/Users/David/CLionProjects/EDA2_Lab/cmake-build-debug/CMakeFiles/EDA2_Lab.dir
-C:/Users/David/CLionProjects/EDA2_Lab/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/David/CLionProjects/EDA2_Lab/cmake-build-debug/CMakeFiles/rebuild_cache.dir
