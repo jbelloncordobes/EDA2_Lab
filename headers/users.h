@@ -8,7 +8,7 @@
 #include <Windows.h>
 
 // Definitions
-#define MAX_LENGTH 50
+#define MAX_LENGTH 100
 #define MAX_HOBBIES 5
 #define MAX_USERS 10
 // Structs
@@ -19,6 +19,12 @@ typedef struct user{
     wchar_t email[MAX_LENGTH];
     wchar_t location[MAX_LENGTH];
     wchar_t hobbies[MAX_HOBBIES][MAX_LENGTH];
+    struct user** friend_requests_received; // Cola
+    int frr_size;
+    struct user** friend_requests_sent; // Cola
+    int frs_size;
+    struct user** friends;
+    int f_size;
 } user;
 
 typedef struct Node{
@@ -34,6 +40,9 @@ typedef struct NodeList{
 
 // Forward Declarations
 struct tm getCurrentDate();
+user* findUser(nodelist nlist, wchar_t usernameid[]);
 void OperateAs(HWND, nodelist);
 void addUser(nodelist* nlist, user* newuser);
+void add_to_queue(user **userarray, int *size, user* addeduser);
+int sendFriendRequest(nodelist nlist, wchar_t friend_nameid[], wchar_t user_nameid[]);
 #endif //EDA2_LAB_USERS_H

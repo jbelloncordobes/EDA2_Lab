@@ -7,24 +7,63 @@
 #include <time.h>
 #include <stdio.h>
 
-struct tm getCurrentDate(){
+struct tm getCurrentDate() {
     struct tm currentdate;
     time_t current_t = time(NULL);
     currentdate = *localtime(&current_t);
     return currentdate;
 }
 
-void addUser(nodelist* nlist, user* newuser){
+void addUser(nodelist *nlist, user *newuser) {
     unode *n = malloc(sizeof(unode));
     n->User = newuser;
     if (nlist->first == NULL) {
         nlist->first = n;
-    }
-    else{
+    } else {
         nlist->last->next = n;
     }
     nlist->last = n;
     n->next = NULL;
+}
+
+user *findUser(nodelist nlist, wchar_t usernameid[]) {
+    wchar_t username[MAX_LENGTH];
+    int id = -1;
+    swscanf(usernameid, L"%[^#]#%d", username, &id);
+
+    unode *curruser = nlist.first;
+    for (int i = 0; i < nlist.size; i++) {
+        if (curruser->User->id == id) {
+            return curruser->User;
+        }
+        curruser = curruser->next;
+    }
+    return NULL;
+
+}
+
+int sendFriendRequest(nodelist nlist, wchar_t friend_nameid[], wchar_t user_nameid[]) {
+    user *friend = findUser(nlist, friend_nameid);
+    user *user = findUser(nlist, user_nameid);
+    if (friend == NULL) {
+        return FALSE;
+    }
+
+//    friend->friend_request_sent
+    add_to_queue(user->friend_requests_sent, &user->frs_size, friend);
+    add_to_queue(user->friend_requests_received, &user->frr_size, user);
+    return TRUE;
+}
+
+void add_to_queue(user **userarray, int *size, user* addeduser) {
+    if (size == 0) {
+        userarray = malloc(sizeof(user*));
+    } else {
+        userarray = realloc(userarray, sizeof(user*) * (*size + 1));
+    }
+
+    userarray[*size] = addeduser;
+    *size += 1;
 }
 
 void OperateAs(HWND hwnd, nodelist users) {
@@ -32,7 +71,7 @@ void OperateAs(HWND hwnd, nodelist users) {
                                    CW_USEDEFAULT, CW_USEDEFAULT, 248, 480, hwnd, NULL, NULL, NULL);
 
     unode *curruser = users.first;
-    wchar_t name[MAX_LENGTH+5];
+    wchar_t name[MAX_LENGTH + 5];
     wchar_t character = '#';
 
     int id;

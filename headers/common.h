@@ -12,6 +12,9 @@
 #define CHANGE_USER 4
 #define SELECT_USER 5
 
+#define TRUE 1
+#define FALSE 0
+
 
 
 // Forward declarations

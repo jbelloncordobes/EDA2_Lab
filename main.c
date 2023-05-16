@@ -32,7 +32,7 @@ HWND hOperateAsButton;
 WNDPROC ButtonProc;
 
 // Control variables
-int active_user;
+user* active_user;
 int serial;
 
 // Interface Control
@@ -41,9 +41,8 @@ int w_height;
 handleStack *AppStack;
 
 // Friends management
-user *friends[MAX_USERS];
 int friends_length;
-HWND hFriends[MAX_USERS];
+HWND hFriends;
 
 // Users management
 
@@ -139,7 +138,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         case WM_CREATE:
             // Global variables initialization
             AppStack = initHandleStack();
-            active_user = -1;
+            // Se comprobará la id del usuario activo antes que nada, no hace falta inicializar más atributos
+            active_user = NULL;
             friends_length = 0;
             serial = 0;
             users.first = NULL;
@@ -149,7 +149,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             w_height = CW_USEDEFAULT;
 
             AddMenu(hwnd);
-//            LoadWindow(hwnd);
             return 0;
         case WM_CLOSE:
             //if (MessageBox(hwnd, L"Really quit?", L"My application", MB_OKCANCEL) == IDOK)
@@ -296,27 +295,16 @@ LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                     }
                     break;
                 case SELECT_USER: {
-                    // Se puede pasar esto a función en users.c
                     wchar_t usernameid[MAX_LENGTH+5];
                     GetWindowTextW((HWND) lp, usernameid, MAX_LENGTH);
-                    wchar_t username[MAX_LENGTH];
-                    int id;
-                    swscanf(usernameid, L"%[^#]#%d", username, &id);
-                    printf("%d\n", id);
-                    unode *curruser = users.first;
-                    for (int i = 0; i < users.size; i++) {
-                        if (curruser->User->id == id) {
-                            wchar_t text[MAX_LENGTH + 15] = L"User Selected: ";
-                            wcscat(text, curruser->User->username);
-
-                            MessageBox(hwnd, text, L"Information", MB_OK);
-                            active_user = id;
-                            break;
-                        }
-                        curruser = curruser->next;
-                    }
-                    if (active_user == -1) {
+                    user* selected_user = findUser(users, usernameid);
+                    if (selected_user == NULL){
                         MessageBox(hwnd, L"Couldn't Select User", L"Information", MB_OK);
+                    } else {
+                        active_user = selected_user;
+                        wchar_t text[MAX_LENGTH + 15] = L"User Selected: ";
+                        wcscat(text, selected_user->username);
+                        MessageBox(hwnd, text, L"Information", MB_OK);
                     }
                     DestroyWindow(hwnd);
                 }
@@ -492,6 +480,13 @@ int createUser(HWND hwnd) {
     wcscpy(newuser->hobbies[2], (const wchar_t *) &hobby3);
     wcscpy(newuser->hobbies[3], (const wchar_t *) &hobby4);
     wcscpy(newuser->hobbies[4], (const wchar_t *) &hobby5);
+
+    newuser->friend_requests_sent = NULL;
+    newuser->friend_requests_received = NULL;
+    newuser->friends = NULL;
+    newuser->frr_size = 0;
+    newuser->frs_size = 0;
+    newuser->f_size = 0;
 
     addUser(&users, newuser);
     unode *newnode = malloc(sizeof(unode));
