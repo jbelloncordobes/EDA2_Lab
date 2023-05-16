@@ -9,15 +9,11 @@ int main() {
 }
 
 void menu(){
-    //int userlength = 0;
-    //user** Users = NULL;
-
+    int userlength = 0;
+    user** Users = NULL;
     int serial = 0;
     char answer[2];
     int decision;
-    nodelist *Users = malloc(sizeof(nodelist));
-    Users->first = NULL;
-    Users->last = NULL;
 
     while(TRUE){
         printf("Que quieres hacer?\n");
@@ -33,14 +29,12 @@ void menu(){
         switch (decision) {
             case 1: {
                 user* newuser = createUser();
-                //addUser(Users, newuser, &userlength);
-                addUser(Users, newuser);
+                addUser(Users, newuser, &userlength);
             }
-                break;
+            break;
             case 2:
-                //listUsers(Users, userlength);
-                listUsers(Users);
-                break;
+                listUsers(Users, userlength);
+            break;
             case 4:
                 return;
             default:
