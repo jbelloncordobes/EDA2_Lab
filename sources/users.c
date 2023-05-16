@@ -65,7 +65,7 @@ user* createUser(){
     }
     if (day > 28){
         if (month == 2){
-            if (!(year % 4 && (year % 100 != 0 || year % 400 == 0))){
+            if ((year % 4 && (year % 100 != 0 || year % 400 == 0)) || day > 29){
                 printf("Introduce un dia valido:\n");
                 goto dday;
             }
@@ -102,13 +102,6 @@ user* createUser(){
         scanf("%s", newuser->hobbies[i]);
     }
 
-//    strcpy(newuser->username, username);
-//    strcpy(newuser->email, email);
-//    strcpy(newuser->birthday, birthday);
-//    strcpy(newuser->location, location);
-//    for(int i = 0; i < 5; i++){
-//        strcpy(newuser->hobbies[i], hobbies[i]);
-//    }
 
 
     printf("\nUsuario Creado\n");
@@ -130,10 +123,15 @@ void addUser(nodelist* nlist, user* newuser){
     n->User = newuser;
     if (nlist->first == NULL) {
         nlist->first = n;
+        nlist->size = 0;
+        nlist->serial = 0;
     }
     else{
         nlist->last->next = n;
+        nlist->size += 0;
     }
+    n->User->id = nlist->serial;
+    nlist->serial+=1;
     nlist->last = n;
     n->next = NULL;
 }

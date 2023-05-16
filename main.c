@@ -1,6 +1,7 @@
 
 #include "headers/common.h"
 #include "headers/users.h"
+#include "sources/csvusers.c"
 
 int main() {
     printf("Bienvenido a nuestra red social!\n");
