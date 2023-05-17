@@ -12,14 +12,13 @@ int main() {
 void menu(){
     //int userlength = 0;
     //user** Users = NULL;
-
     int serial = 0;
     char answer[2];
     int decision;
     nodelist *Users = malloc(sizeof(nodelist));
     Users->first = NULL;
     Users->last = NULL;
-
+    read_users_csv(Users);
     while(TRUE){
         printf("Que quieres hacer?\n");
         printf("1. Insertar un nuevo usuario\n");

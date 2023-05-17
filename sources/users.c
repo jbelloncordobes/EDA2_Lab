@@ -108,6 +108,7 @@ user* createUser(){
     return newuser;
 }
 
+
 /*void addUser(user** array, user* newuser, int *userlength){
     if (array == NULL){
         array = malloc(sizeof(user));
@@ -123,7 +124,7 @@ void addUser(nodelist* nlist, user* newuser){
     n->User = newuser;
     if (nlist->first == NULL) {
         nlist->first = n;
-        nlist->size = 0;
+        nlist->size = 1;
         nlist->serial = 0;
     }
     else{
