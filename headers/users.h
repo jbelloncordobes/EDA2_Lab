@@ -7,8 +7,13 @@
 #define MAX_LENGTH 50
 #define MAX_HOBBIES 5
 
+typedef struct queue{
+    struct user** users;
+    int size;
+}user_queue;
+
 typedef struct user{
-    //int id;
+    int id;
     char username[MAX_LENGTH];
     char birthday[MAX_LENGTH];
     char email[MAX_LENGTH];
@@ -24,6 +29,8 @@ typedef struct Node{
 typedef struct NodeList{
     unode *first;
     unode *last;
+    int size;
+    int serial;
 }nodelist;
 
 user* createUser();
