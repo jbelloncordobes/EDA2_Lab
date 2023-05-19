@@ -24,6 +24,7 @@ typedef struct user{
 typedef struct Node{
     user *User;
     struct Node *next;
+    struct Node *prev;
 }unode;
 
 typedef struct NodeList{
@@ -36,6 +37,7 @@ typedef struct NodeList{
 user* createUser();
 //void addUser(user**, user*, int*);
 void addUser(nodelist*, user*);
+void eraseUser(nodelist*, char*);
 
 //void listUsers(user**, int);
 void listUsers(nodelist*);

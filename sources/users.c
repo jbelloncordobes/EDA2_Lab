@@ -126,10 +126,12 @@ void addUser(nodelist* nlist, user* newuser){
         nlist->first = n;
         nlist->size = 1;
         nlist->serial = 0;
+        n->prev = NULL;
     }
     else{
         nlist->last->next = n;
-        nlist->size += 0;
+        nlist->size += 1;
+        n->prev = nlist->last;
     }
     n->User->id = nlist->serial;
     nlist->serial+=1;
@@ -137,6 +139,19 @@ void addUser(nodelist* nlist, user* newuser){
     n->next = NULL;
 }
 
+void eraseUser(nodelist *nlist, char* name){
+    unode *n = nlist->first;
+    while (n!= NULL){
+        if (strcmp(n->User->username, name) == 0){
+            n->prev->next = n->next;
+            n->next->prev = n->prev;
+            n = NULL;
+            free(n);
+            return;
+        }
+        n = n->next;
+    }
+}
 
 /*void listUsers(user** array, int userlength){
     printf("Estos son todos los usuarios: \n");

@@ -1,7 +1,7 @@
 
 #include "headers/common.h"
 #include "headers/users.h"
-#include "sources/csvusers.c"
+#include "headers/csvusers.h"
 
 int main() {
     printf("Bienvenido a nuestra red social!\n");
@@ -42,6 +42,7 @@ void menu(){
                 listUsers(Users);
             break;
             case 4:
+                write_users_csv(Users);
                 return;
             default:
                 printf("Opcion invalida\n");
