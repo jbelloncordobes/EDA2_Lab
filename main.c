@@ -227,24 +227,27 @@ void LoadWindow(HWND hwnd) {
     }
 
     int width_unit = ((w_width) / 12);
+    int height_unit = ((w_height) / 24);
 
     // Separadores
-    HWND separator1 = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 0, 0, 2 * width_unit, 700,
+//    HWND separator1 = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 0, 0, 2 * width_unit, 700,
+//                                      hwnd, NULL, NULL, NULL);
+    HWND separator1 = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 0, 0, 2 * width_unit, w_height,
                                       hwnd, NULL, NULL, NULL);
     HWND separator2 = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 2 * width_unit, 0,
-                                      8 * width_unit, 700, hwnd, NULL, NULL, NULL);
+                                      8 * width_unit, w_height, hwnd, NULL, NULL, NULL);
     HWND separator3 = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 10 * width_unit, 0,
-                                      2 * width_unit, 700, hwnd, NULL, NULL, NULL);
+                                      2 * width_unit, w_height, hwnd, NULL, NULL, NULL);
 
     // Parte central - chat
-    HWND chat = CreateWindowExW(0, L"static", L"Chat vacío", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 0, 0, 8 * width_unit,
-                    600, separator2, NULL, NULL, NULL);
+    HWND chat = CreateWindowExW(0, L"static", L"Chat vacío", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 2*width_unit, 0, 8 * width_unit,
+                                (7*w_height)/8, hwnd, NULL, NULL, NULL);
     HWND messagebox = CreateWindowExW(0, L"edit", L"Selecciona un chat y escribe un mensaje",
-                            WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 2 * width_unit, 600, 8 * width_unit, 100, hwnd,
+                            WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_LEFT, 2 * width_unit, (7*w_height)/8, 8 * width_unit, (w_height/8)-2, hwnd,
                             NULL, NULL, NULL);
 
     // Título parte izquierda (usuarios)
-    HWND listtitle = CreateWindowExW(0, L"static", L"Todos los usuarios", WS_VISIBLE | WS_CHILD | SS_CENTER, 0, 0, 2 * width_unit, 16,
+    HWND listtitle = CreateWindowExW(0, L"static", L"Usuarios", WS_VISIBLE | WS_CHILD | SS_CENTER, 2, 8, (2 * width_unit) - 16, 16,
                     hwnd, NULL, NULL, NULL);
 
     // Botón parte derecha (acciones)
@@ -273,9 +276,14 @@ void LoadWindow(HWND hwnd) {
 //                                   (HMENU) OPEN_CHAT, NULL, NULL);
         id = curruser->User->id;
         swprintf(name, sizeof(name) / sizeof(wchar_t), L"%ls%c%d", curruser->User->username, character, id);
-
-        CreateWindowExW(0, L"Button", name, WS_VISIBLE | WS_CHILD | SS_CENTER,
-                        (2 * (width_unit)) / 6, 24 + i * 48 + i * 8, (4 * (width_unit)) / 3, 48, hwnd,
+//        if (i == 0){
+//            CreateWindowExW(0, L"Button", name, WS_VISIBLE | WS_CHILD | SS_CENTER,
+//                            (2 * (width_unit)) / 6, 36 + i * 48 + i * 8, (4 * (width_unit)) / 3, 48, hwnd,
+//                            (HMENU) OPEN_CHAT, NULL, NULL);
+//            continue;
+//        }
+        CreateWindowExW(0, L"static", name, WS_VISIBLE | WS_CHILD | SS_CENTER,
+                        (2 * (width_unit)) / 6, 36 + i * 16 + i * 4, (4 * (width_unit)) / 3, 16, hwnd,
                         (HMENU) OPEN_CHAT, NULL, NULL);
 
         curruser = curruser->next;
