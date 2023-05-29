@@ -12,6 +12,7 @@
 #include "headers/handleStack.h"
 #include "headers/common.h"
 #include "headers/users.h"
+#include "headers/user_arrays.h"
 
 #pragma comment(lib, "User32.lib")
 
@@ -131,14 +132,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                     displayForm(hwnd);
                     break;
                 case CHANGE_USER:
-                    OperateAs(hwnd, users);
+                    operateAs(hwnd, users);
                     break;
                 case OPEN_SEND_FR:
                     if (active_user == NULL){
                         MessageBoxW(hwnd, L"No se está operando como ningún usuario", L"Usuario no seleccionado", MB_ICONEXCLAMATION);
                         break;
                     }
-                    SendFRModal(hwnd, users, *active_user);
+                    sendFRModal(hwnd, users, *active_user);
                     break;
                 case OPEN_RECEIVED_FR:
                     if (active_user == NULL){
@@ -365,7 +366,7 @@ LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                 case SELECT_USER: {
                     wchar_t usernameid[MAX_LENGTH+5];
                     GetWindowTextW((HWND) lp, usernameid, MAX_LENGTH);
-                    user* selected_user = findUser(users, usernameid);
+                    user* selected_user = getUser(users, usernameid);
                     if (selected_user == NULL){
                         MessageBox(hwnd, L"No se pudo seleccionar al usuario", L"Información", MB_OK);
                     } else {
@@ -381,7 +382,7 @@ LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                 case FR_BUTTON: {
                     wchar_t usernameid[MAX_LENGTH+5];
                     GetWindowTextW((HWND) lp, usernameid, MAX_LENGTH);
-                    user* selected_user = findUser(users, usernameid);
+                    user* selected_user = getUser(users, usernameid);
                     if (selected_user == NULL){
                         MessageBox(hwnd, L"No se pudo enviar la solicitud de amistad", L"Error", MB_ICONEXCLAMATION);
                     } else {
@@ -398,7 +399,7 @@ LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                 case RFR_BUTTON:{
                     wchar_t usernameid[MAX_LENGTH+5];
                     GetWindowTextW((HWND) lp, usernameid, MAX_LENGTH);
-                    user* selected_user = findUser(users, usernameid);
+                    user* selected_user = getUser(users, usernameid);
                     if (selected_user == NULL){
                         MessageBox(hwnd, L"No se pudo aceptar la solicitud de amistad", L"Error", MB_ICONEXCLAMATION);
                     } else {
@@ -418,7 +419,7 @@ LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                 case SFR_BUTTON:{
                     wchar_t usernameid[MAX_LENGTH+5];
                     GetWindowTextW((HWND) lp, usernameid, MAX_LENGTH);
-                    user* selected_user = findUser(users, usernameid);
+                    user* selected_user = getUser(users, usernameid);
                     if (selected_user == NULL){
                         MessageBox(hwnd, L"No se pudo rechazar la solicitud de amistad", L"Error", MB_ICONEXCLAMATION);
                     } else {
