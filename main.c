@@ -87,7 +87,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             // It uses the CLASS_NAME we created previously
             CLASS_NAME,
             // The window text, used depending on the type of window
-            L"Test Application",
+            L"Red Social",
             // The style the window uses. WS_OVERLAPPEDWINDOW includes title bar, border, system menu and minimize and maximize buttons
             WS_OVERLAPPEDWINDOW,
             // The Size and position. CW_USEDEFAULT are the default values
@@ -133,6 +133,27 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 case CHANGE_USER:
                     OperateAs(hwnd, users);
                     break;
+                case OPEN_SEND_FR:
+                    if (active_user == NULL){
+                        MessageBoxW(hwnd, L"No se está operando como ningún usuario", L"Usuario no seleccionado", MB_ICONEXCLAMATION);
+                        break;
+                    }
+                    SendFRModal(hwnd, users, *active_user);
+                    break;
+                case OPEN_RECEIVED_FR:
+                    if (active_user == NULL){
+                        MessageBoxW(hwnd, L"No se está operando como ningún usuario", L"Usuario no seleccionado", MB_ICONEXCLAMATION);
+                        break;
+                    }
+                    receivedFRModal(hwnd, active_user);
+                    break;
+                case OPEN_SENT_FR:
+                    if (active_user == NULL){
+                        MessageBoxW(hwnd, L"No se está operando como ningún usuario", L"Usuario no seleccionado", MB_ICONEXCLAMATION);
+                        break;
+                    }
+                    sentFRModal(hwnd, active_user);
+                    break;
             }
             return 0;
         case WM_CREATE:
@@ -151,7 +172,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             AddMenu(hwnd);
             return 0;
         case WM_CLOSE:
-            //if (MessageBox(hwnd, L"Really quit?", L"My application", MB_OKCANCEL) == IDOK)
+            // if (MessageBox(hwnd, L"Really quit?", L"My application", MB_OKCANCEL) == IDOK)
         {
             printf("Closing");
             DestroyWindow(hwnd);
@@ -197,12 +218,6 @@ void Paint(HWND hwnd) {
     EndPaint(hwnd, &ps);
 }
 
-// Creo que no hace nada
-void OnSize(HWND hwnd, UINT flag, int width, int height) {
-    Paint(hwnd);
-//    (void)flag;
-}
-
 // La barra que se ve arriba
 void AddMenu(HWND hwnd) {
     HMENU hMenu = CreateMenu();
@@ -246,13 +261,26 @@ void LoadWindow(HWND hwnd) {
                             WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_LEFT, 2 * width_unit, (7*w_height)/8, 8 * width_unit, (w_height/8)-2, hwnd,
                             NULL, NULL, NULL);
 
-    // Título parte izquierda (usuarios)
-    HWND listtitle = CreateWindowExW(0, L"static", L"Usuarios", WS_VISIBLE | WS_CHILD | SS_CENTER, 2, 8, (2 * width_unit) - 16, 16,
-                    hwnd, NULL, NULL, NULL);
 
-    // Botón parte derecha (acciones)
+    // Botón parte derecha (Operar como)
     HWND operateas = CreateWindowExW(0, L"Button", L"Operar como", WS_VISIBLE | WS_CHILD, (10 * width_unit) + ((2 * width_unit) / 6), 24,
                     (2 * (2 * width_unit)) / 3, 30, hwnd, (HMENU) CHANGE_USER, NULL, NULL);
+
+    // Botón parte derecha (Agregar amigos)
+    HWND add_friends = CreateWindowExW(0, L"Button", L"Agregar amigos", WS_VISIBLE | WS_CHILD, (10 * width_unit) + ((2 * width_unit) / 6), 24+30+12,
+                                           (2 * (2 * width_unit)) / 3, 30, hwnd, (HMENU) OPEN_SEND_FR, NULL, NULL);
+
+    // Botón parte derecha (Solicitudes de amistad)
+    HWND friend_requests = CreateWindowExW(0, L"Button", L"Solicitudes recibidas", WS_VISIBLE | WS_CHILD, (10 * width_unit) + ((2 * width_unit) / 6), 24+2*30+2*12,
+                                           (2 * (2 * width_unit)) / 3, 30, hwnd, (HMENU) OPEN_RECEIVED_FR, NULL, NULL);
+
+    // Botón parte derecha (Peticiones de amistad enviadas)
+    HWND friend_requests_sent = CreateWindowExW(0, L"Button", L"Solicitudes enviadas", WS_VISIBLE | WS_CHILD, (10 * width_unit) + ((2 * width_unit) / 6), 24+3*30+3*12,
+                                           (2 * (2 * width_unit)) / 3, 30, hwnd, (HMENU) OPEN_SENT_FR, NULL, NULL);
+
+    // Título parte izquierda (usuarios)
+    HWND users_title = CreateWindowExW(0, L"static", L"Usuarios", WS_VISIBLE | WS_CHILD | SS_CENTER, 2, 8, (2 * width_unit) - 16, 16,
+                                       hwnd, NULL, NULL, NULL);
 
     // Agregados los handles al stack de la aplicación.
     addHandle(AppStack, separator1);
@@ -260,33 +288,65 @@ void LoadWindow(HWND hwnd) {
     addHandle(AppStack, separator3);
     addHandle(AppStack, chat);
     addHandle(AppStack, messagebox);
-    addHandle(AppStack, listtitle);
+    addHandle(AppStack, users_title);
     addHandle(AppStack, operateas);
+    addHandle(AppStack, add_friends);
+    addHandle(AppStack, friend_requests);
+    addHandle(AppStack, friend_requests_sent);
 
-    // Los botones de los usuarios
+    // La lista de usuarios
     unode *curruser = users.first;
     wchar_t name[MAX_LENGTH+5];
     wchar_t character = '#';
     int id;
-
-    for (int i = 0; i < users.size; i++) {
-//        hUsers[i] = CreateWindowExW(0, L"Button", users[i].username, WS_VISIBLE | WS_CHILD | SS_CENTER, 8, 24 + i*48 + i*8, 200, 48, separator1,
-//                                    (HMENU) OPEN_CHAT, NULL, NULL);
-//        hUsers[i] = CreateWindowExW(0, L"Button", users[i].username, WS_VISIBLE | WS_CHILD | SS_CENTER, (2*(width_unit))/6, 24 + i*48 + i*8, (4*(width_unit))/3, 48, separator1,
-//                                   (HMENU) OPEN_CHAT, NULL, NULL);
+    int i = 0;
+    while (curruser != NULL) {
         id = curruser->User->id;
-        swprintf(name, sizeof(name) / sizeof(wchar_t), L"%ls%c%d", curruser->User->username, character, id);
-//        if (i == 0){
-//            CreateWindowExW(0, L"Button", name, WS_VISIBLE | WS_CHILD | SS_CENTER,
-//                            (2 * (width_unit)) / 6, 36 + i * 48 + i * 8, (4 * (width_unit)) / 3, 48, hwnd,
-//                            (HMENU) OPEN_CHAT, NULL, NULL);
-//            continue;
-//        }
-        CreateWindowExW(0, L"static", name, WS_VISIBLE | WS_CHILD | SS_CENTER,
-                        (2 * (width_unit)) / 6, 36 + i * 16 + i * 4, (4 * (width_unit)) / 3, 16, hwnd,
-                        (HMENU) OPEN_CHAT, NULL, NULL);
+        if (active_user != NULL){
+            if (active_user->id == id){
+                curruser = curruser->next;
+                continue;
+            }
+            if (search_User(active_user->friends, id) == TRUE){
+                curruser = curruser->next;
+                continue;
+            }
+        }
 
+        swprintf(name, sizeof(name) / sizeof(wchar_t), L"%ls%c%d", curruser->User->username, character, id);
+
+        HWND user = CreateWindowExW(0, L"static", name, WS_VISIBLE | WS_CHILD | SS_CENTER,
+                            2, 36 + i * 16 + i * 4, (2 * width_unit) - 16, 16, hwnd,
+                        (HMENU) OPEN_CHAT, NULL, NULL);
+        addHandle(AppStack, user);
         curruser = curruser->next;
+        i++;
+    }
+    int final_elements = i + 1;
+    // printf("%d\n", final_elements);
+
+    // Título parte izquierda (amigos)
+    HWND friends_title = CreateWindowExW(0, L"static", L"Amigos", WS_VISIBLE | WS_CHILD | SS_CENTER, 2, 36 + 8 + final_elements * 16 + final_elements * 4,
+                                         (2 * width_unit) - 16, 16, hwnd, NULL, NULL, NULL);
+
+    addHandle(AppStack, friends_title);
+    if (active_user == NULL) return;
+    if (active_user->friends.size == 0){
+        return;
+    }
+    i = 0;
+    user* currfriend;
+    while (i < active_user->friends.size) {
+        currfriend = active_user->friends.users[i];
+        id = currfriend->id;
+
+        swprintf(name, sizeof(name) / sizeof(wchar_t), L"%ls%c%d", currfriend->username, character, id);
+
+        HWND friend = CreateWindowExW(0, L"static", name, WS_VISIBLE | WS_CHILD | SS_CENTER,
+                                      2, (36 + 8 + final_elements * 16 + final_elements * 4) + (i * 16 + i * 4) + 24, (2 * width_unit) - 16, 16, hwnd,
+                                    NULL, NULL, NULL);
+        addHandle(AppStack, friend);
+        i++;
     }
 
 }
@@ -307,15 +367,79 @@ LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                     GetWindowTextW((HWND) lp, usernameid, MAX_LENGTH);
                     user* selected_user = findUser(users, usernameid);
                     if (selected_user == NULL){
-                        MessageBox(hwnd, L"Couldn't Select User", L"Information", MB_OK);
+                        MessageBox(hwnd, L"No se pudo seleccionar al usuario", L"Información", MB_OK);
                     } else {
                         active_user = selected_user;
-                        wchar_t text[MAX_LENGTH + 15] = L"User Selected: ";
+                        wchar_t text[MAX_LENGTH + 22] = L"Usuario Seleccionado: ";
                         wcscat(text, selected_user->username);
                         MessageBox(hwnd, text, L"Information", MB_OK);
                     }
                     DestroyWindow(hwnd);
+                    LoadWindow(mainWindow);
                 }
+                break;
+                case FR_BUTTON: {
+                    wchar_t usernameid[MAX_LENGTH+5];
+                    GetWindowTextW((HWND) lp, usernameid, MAX_LENGTH);
+                    user* selected_user = findUser(users, usernameid);
+                    if (selected_user == NULL){
+                        MessageBox(hwnd, L"No se pudo enviar la solicitud de amistad", L"Error", MB_ICONEXCLAMATION);
+                    } else {
+                        wchar_t text[MAX_LENGTH + 32] = L"¿Enviar solicitud de amistad a ";
+                        wcscat(text, selected_user->username);
+                        wcscat(text, L"?");
+                        if (MessageBox(hwnd, text, L"¿Estás seguro?", MB_OKCANCEL) == IDOK){
+                            sendFriendRequest(active_user, selected_user);
+                        }
+                    }
+                    DestroyWindow(hwnd);
+                }
+                break;
+                case RFR_BUTTON:{
+                    wchar_t usernameid[MAX_LENGTH+5];
+                    GetWindowTextW((HWND) lp, usernameid, MAX_LENGTH);
+                    user* selected_user = findUser(users, usernameid);
+                    if (selected_user == NULL){
+                        MessageBox(hwnd, L"No se pudo aceptar la solicitud de amistad", L"Error", MB_ICONEXCLAMATION);
+                    } else {
+                        wchar_t text[MAX_LENGTH + 24] = L"¿Aceptar solicitud de ";
+                        wcscat(text, selected_user->username);
+                        wcscat(text, L"?");
+                        if (MessageBox(hwnd, text, L"¿Estás seguro?", MB_OKCANCEL) == IDOK){
+                            acceptFriendRequest(active_user, selected_user);
+                            LoadWindow(mainWindow);
+                        } else {
+                            rejectFriendRequest(active_user, selected_user);
+                        }
+                    }
+                    DestroyWindow(hwnd);
+                }
+                break;
+                case SFR_BUTTON:{
+                    wchar_t usernameid[MAX_LENGTH+5];
+                    GetWindowTextW((HWND) lp, usernameid, MAX_LENGTH);
+                    user* selected_user = findUser(users, usernameid);
+                    if (selected_user == NULL){
+                        MessageBox(hwnd, L"No se pudo rechazar la solicitud de amistad", L"Error", MB_ICONEXCLAMATION);
+                    } else {
+                        wchar_t text[MAX_LENGTH + 25] = L"¿Cancelar solicitud de ";
+                        wcscat(text, selected_user->username);
+                        wcscat(text, L"?");
+                        if (MessageBox(hwnd, text, L"¿Estás seguro?", MB_OKCANCEL) == IDOK){
+                            rejectFriendRequest(selected_user, active_user);
+                        }
+                    }
+                    DestroyWindow(hwnd);
+                }
+                break;
+                case DENY_FR:{
+
+                }
+                break;
+                case CANCEL:{
+
+                }
+                break;
             }
             break;
         case WM_CLOSE:
@@ -346,7 +470,7 @@ void registerFormClass(HINSTANCE hInstance) {
 void displayForm(HWND hwnd) {
     int window_width = 460;
     int window_height = 400;
-    HWND windowH = CreateWindowExW(0, L"DialogWindow", L"New User", WS_VISIBLE | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
+    HWND windowH = CreateWindowExW(0, L"DialogWindow", L"Nuevo Usuario", WS_VISIBLE | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
                                    CW_USEDEFAULT, window_width, window_height, hwnd, NULL, NULL, NULL);
 
     int paddingx = 24;

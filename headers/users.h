@@ -12,10 +12,10 @@
 #define MAX_HOBBIES 5
 #define MAX_USERS 10
 // Structs
-typedef struct user_queue{
+typedef struct user_array{
     struct user** users;
     int size;
-}user_queue;
+}user_array;
 
 
 typedef struct user{
@@ -25,9 +25,9 @@ typedef struct user{
     wchar_t email[MAX_LENGTH];
     wchar_t location[MAX_LENGTH];
     wchar_t hobbies[MAX_HOBBIES][MAX_LENGTH];
-    struct user_queue friend_requests_received; // Cola
-    struct user_queue friend_requests_sent; // Cola
-    struct user_queue friends;
+    struct user_array friend_requests_received; // Cola
+    struct user_array friend_requests_sent; // Cola
+    struct user_array friends;
 } user;
 
 typedef struct Node{
@@ -46,6 +46,13 @@ struct tm getCurrentDate();
 user* findUser(nodelist nlist, wchar_t usernameid[]);
 void OperateAs(HWND, nodelist);
 void addUser(nodelist* nlist, user* newuser);
-void add_to_queue(user_queue* queue, user* addeduser);
-int sendFriendRequest(nodelist nlist, wchar_t friend_nameid[], wchar_t user_nameid[]);
+void add_to_array(user_array* array, user* addeduser);
+void remove_from_array(user_array* array, user* addeduser);
+void sendFriendRequest(user*, user*);
+void acceptFriendRequest(user*, user*);
+void rejectFriendRequest(user*, user*);
+int search_User(user_array, int);
+void SendFRModal(HWND hwnd, nodelist users, user active_user);
+void receivedFRModal(HWND hwnd, user* active_user);
+void sentFRModal(HWND hwnd, user* active_user);
 #endif //EDA2_LAB_USERS_H

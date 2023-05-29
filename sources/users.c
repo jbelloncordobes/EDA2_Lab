@@ -26,7 +26,7 @@ void addUser(nodelist *nlist, user *newuser) {
     n->next = NULL;
 }
 
-user *findUser(nodelist nlist, wchar_t usernameid[]) {
+user* findUser(nodelist nlist, wchar_t usernameid[]) {
     wchar_t username[MAX_LENGTH];
     int id = -1;
     swscanf(usernameid, L"%[^#]#%d", username, &id);
@@ -42,28 +42,56 @@ user *findUser(nodelist nlist, wchar_t usernameid[]) {
 
 }
 
-int sendFriendRequest(nodelist nlist, wchar_t friend_nameid[], wchar_t user_nameid[]) {
-    user *friend = findUser(nlist, friend_nameid);
-    user *user = findUser(nlist, user_nameid);
+void sendFriendRequest(user* active_user, user* friend) {
     if (friend == NULL) {
-        return FALSE;
+        return;
     }
-
-//    friend->friend_request_sent
-    add_to_queue(&user->friend_requests_sent, friend);
-    add_to_queue(&friend->friend_requests_received,user);
-    return TRUE;
+    add_to_array(&active_user->friend_requests_sent, friend);
+    add_to_array(&friend->friend_requests_received, active_user);
 }
 
-void add_to_queue(user_queue* queue, user* addeduser) {
-    if (queue->size == 0) {
-        queue->users = malloc(sizeof(user*));
+void acceptFriendRequest(user* active_user, user* friend) {
+    if (friend == NULL) {
+        return;
+    }
+    remove_from_array(&active_user->friend_requests_received, friend);
+    remove_from_array(&friend->friend_requests_sent, active_user);
+    add_to_array(&active_user->friends, friend);
+    add_to_array(&friend->friends, active_user);
+}
+
+void rejectFriendRequest(user* active_user, user* friend) {
+    if (friend == NULL) {
+        return;
+    }
+    remove_from_array(&active_user->friend_requests_received, friend);
+    remove_from_array(&friend->friend_requests_sent, active_user);
+}
+
+
+void add_to_array(user_array* array, user* addeduser) {
+    if (array->size == 0) {
+        array->users = malloc(sizeof(user*));
     } else {
-        queue->users = realloc(queue->users, sizeof(user*) * (queue->size + 1));
+        array->users = realloc(array->users, sizeof(user*) * (array->size + 1));
     }
 
-    queue->users[queue->size] = addeduser;
-    queue->size += 1;
+    array->users[array->size] = addeduser;
+    array->size += 1;
+}
+
+void remove_from_array(user_array* array, user* removeduser) {
+    int removed = FALSE;
+    for (int i = 0; i < array->size; i++){
+        if (removed == TRUE){
+            array->users[i-1] = array->users[i];
+        }
+        if (array->users[i]->id == removeduser->id){
+            removed = TRUE;
+        }
+    }
+
+    array->size -= 1;
 }
 
 void OperateAs(HWND hwnd, nodelist users) {
@@ -83,5 +111,77 @@ void OperateAs(HWND hwnd, nodelist users) {
                         (HMENU) SELECT_USER, NULL, NULL);
 
         curruser = curruser->next;
+    }
+}
+
+int search_User(user_array users, int id){
+    for (int i = 0; i < users.size; i++){
+        if (id == users.users[i]->id){
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+void SendFRModal(HWND hwnd, nodelist users, user active_user) {
+    HWND windowH = CreateWindowExW(0, L"DialogWindow", L"Enviar solicitud de amistad", WS_VISIBLE | WS_OVERLAPPEDWINDOW,
+                                   CW_USEDEFAULT, CW_USEDEFAULT, 248, 480, hwnd, NULL, NULL, NULL);
+
+    unode *curruser = users.first;
+    wchar_t name[MAX_LENGTH + 5];
+    wchar_t character = '#';
+
+    int id;
+    int i = 0;
+    while (curruser != NULL) {
+        id = curruser->User->id;
+        if (search_User(active_user.friends,id) || search_User(active_user.friend_requests_sent,id) || search_User(active_user.friend_requests_received,id) || active_user.id == curruser->User->id){
+            curruser = curruser->next;
+            continue;
+        }
+
+        swprintf(name, sizeof(name) / sizeof(wchar_t), L"%ls%c%d", curruser->User->username, character, id);
+        CreateWindowExW(0, L"Button", name, WS_VISIBLE | WS_CHILD | SS_CENTER, 8,
+                        24 + i * 48 + i * 8, 200, 48, windowH,
+                        (HMENU) FR_BUTTON, NULL, NULL);
+
+        curruser = curruser->next;
+        i++;
+    }
+}
+
+void receivedFRModal(HWND hwnd, user* active_user){
+    HWND windowH = CreateWindowExW(0, L"DialogWindow", L"Solicitudes recibidas", WS_VISIBLE | WS_OVERLAPPEDWINDOW,
+                                   CW_USEDEFAULT, CW_USEDEFAULT, 248, 480, hwnd, NULL, NULL, NULL);
+
+
+    wchar_t name[MAX_LENGTH + 5];
+    wchar_t character = '#';
+
+    int id;
+    for (int i = 0; i < active_user->friend_requests_received.size; i++){
+        id = active_user->friend_requests_received.users[i]->id;
+        swprintf(name, sizeof(name) / sizeof(wchar_t), L"%ls%c%d", active_user->friend_requests_received.users[i]->username, character, id);
+        CreateWindowExW(0, L"Button", name, WS_VISIBLE | WS_CHILD | SS_CENTER, 8,
+                        24 + i * 48 + i * 8, 200, 48, windowH,
+                        (HMENU) RFR_BUTTON, NULL, NULL);
+    }
+}
+
+void sentFRModal(HWND hwnd, user* active_user){
+    HWND windowH = CreateWindowExW(0, L"DialogWindow", L"Solicitudes enviadas", WS_VISIBLE | WS_OVERLAPPEDWINDOW,
+                                   CW_USEDEFAULT, CW_USEDEFAULT, 248, 480, hwnd, NULL, NULL, NULL);
+
+
+    wchar_t name[MAX_LENGTH + 5];
+    wchar_t character = '#';
+
+    int id;
+    for (int i = 0; i < active_user->friend_requests_sent.size; i++){
+        id = active_user->friend_requests_sent.users[i]->id;
+        swprintf(name, sizeof(name) / sizeof(wchar_t), L"%ls%c%d", active_user->friend_requests_sent.users[i]->username, character, id);
+        CreateWindowExW(0, L"Button", name, WS_VISIBLE | WS_CHILD | SS_CENTER, 8,
+                        24 + i * 48 + i * 8, 200, 48, windowH,
+                        (HMENU) SFR_BUTTON, NULL, NULL);
     }
 }
