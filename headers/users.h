@@ -6,17 +6,18 @@
 #define EDA2_LAB_USERS_H
 
 #include <Windows.h>
+#include "common.h"
 
 // Definitions
 #define MAX_LENGTH 100
 #define MAX_HOBBIES 5
-#define MAX_USERS 10
+
 // Structs
-typedef struct user_queue{
+// user_array se define aquí porque da problemas para leerlo bien en su header
+typedef struct user_array{
     struct user** users;
     int size;
-}user_queue;
-
+}user_array;
 
 typedef struct user{
     int id;
@@ -25,10 +26,12 @@ typedef struct user{
     wchar_t email[MAX_LENGTH];
     wchar_t location[MAX_LENGTH];
     wchar_t hobbies[MAX_HOBBIES][MAX_LENGTH];
-    struct user_queue friend_requests_received; // Cola
-    struct user_queue friend_requests_sent; // Cola
-    struct user_queue friends;
+    struct user_array friend_requests_received; // Cola
+    struct user_array friend_requests_sent; // Cola
+    struct user_array friends;
 } user;
+
+
 
 typedef struct Node{
     user *User;
@@ -43,9 +46,11 @@ typedef struct NodeList{
 
 // Forward Declarations
 struct tm getCurrentDate();
-user* findUser(nodelist nlist, wchar_t usernameid[]);
-void OperateAs(HWND, nodelist);
-void addUser(nodelist* nlist, user* newuser);
-void add_to_queue(user_queue* queue, user* addeduser);
-int sendFriendRequest(nodelist nlist, wchar_t friend_nameid[], wchar_t user_nameid[]);
+user* getUser(nodelist, wchar_t[]);
+void operateAs(HWND, nodelist);
+void addUser(nodelist*, user*);
+
+void sendFRModal(HWND hwnd, nodelist, user);
+void receivedFRModal(HWND hwnd, user*);
+void sentFRModal(HWND hwnd, user*);
 #endif //EDA2_LAB_USERS_H
