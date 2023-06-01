@@ -170,3 +170,19 @@ void listUsers(nodelist* nlist){
     }
     printf("\n");
 }
+
+void send_friend_req(user* sender, user* receiver){
+
+}
+
+void confirm_friend(user* sender, user* receiver){
+
+}
+
+void add_friend(user* user1, user* friend){
+    if (user1->friendlist == NULL){
+        user1->friendlist = malloc(sizeof(user));
+        user1->friendlist[0] = friend;
+        return;
+    }
+}

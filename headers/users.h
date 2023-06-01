@@ -19,6 +19,8 @@ typedef struct user{
     char email[MAX_LENGTH];
     char location[MAX_LENGTH];
     char hobbies[MAX_HOBBIES][MAX_LENGTH];
+    struct user** friendlist;
+    struct user** freqlist;
 } user;
 
 typedef struct Node{
@@ -41,5 +43,7 @@ void eraseUser(nodelist*, char*);
 
 //void listUsers(user**, int);
 void listUsers(nodelist*);
+
+
 
 #endif //PLANB_USERS_H
