@@ -182,7 +182,23 @@ void confirm_friend(user* sender, user* receiver){
 void add_friend(user* user1, user* friend){
     if (user1->friendlist == NULL){
         user1->friendlist = malloc(sizeof(user));
-        user1->friendlist[0] = friend;
-        return;
+        user1->friendlist->list[0] = friend;
+        user1->friendlist->size = 1;
+    }
+    else{
+        user1->friendlist->list = realloc(user1->friendlist->list, sizeof(user)*user1->friendlist->size+1);
+        user1->friendlist->list[user1->friendlist->size] = friend;
+        user1->friendlist->size+=1;
+    }
+    erase_freq(user1->freqlist, friend);
+}
+
+void erase_freq(userlist* freqs, user* u){
+    for (int i = 0; i<freqs->size; i++){
+        if (freqs->list[i] == u){
+            free(freqs->list[i]);
+            freqs->list[i] = NULL;
+            freqs->size-=1;
+        }
     }
 }

@@ -11,6 +11,10 @@ typedef struct queue{
     struct user** users;
     int size;
 }user_queue;
+typedef struct userlist{
+    struct user** list;
+    int size;
+} userlist;
 
 typedef struct user{
     int id;
@@ -19,8 +23,9 @@ typedef struct user{
     char email[MAX_LENGTH];
     char location[MAX_LENGTH];
     char hobbies[MAX_HOBBIES][MAX_LENGTH];
-    struct user** friendlist;
-    struct user** freqlist;
+    struct userlist* friendlist;
+    struct userlist* freqlist;
+    struct userlist* sent;
 } user;
 
 typedef struct Node{
@@ -43,7 +48,11 @@ void eraseUser(nodelist*, char*);
 
 //void listUsers(user**, int);
 void listUsers(nodelist*);
+void erase_freq(userlist*, user*);
+void add_friend(user*, user*);
+void send_friend_req(user*, user*);
 
+void confirm_friend(user*, user*);
 
 
 #endif //PLANB_USERS_H
