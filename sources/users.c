@@ -161,6 +161,7 @@ void eraseUser(nodelist *nlist, char* name){
     printf("\n");
 }*/
 
+
 void listUsers(nodelist* nlist){
     printf("Estos son todos los usuarios: \n");
     unode *n = nlist->first;
@@ -172,25 +173,27 @@ void listUsers(nodelist* nlist){
 }
 
 void send_friend_req(user* sender, user* receiver){
-
+    //Si en la lista de friendrequests del sender ya está el receiver, entonces printf para avisar.
+    //En cualquier otro caso, añadir el sender a la friendrequest list del receiver y notificar al sender con un printf.
 }
 
 void confirm_friend(user* sender, user* receiver){
-
+    //Llamar a add_friend desde las dos perspectivas (sender y receiver).
 }
 
-void add_friend(user* user1, user* friend){
+
+void add_friend(user* user1, user* newfriend){
     if (user1->friendlist == NULL){
         user1->friendlist = malloc(sizeof(user));
-        user1->friendlist->list[0] = friend;
+        user1->friendlist->list[0] = newfriend;
         user1->friendlist->size = 1;
     }
     else{
         user1->friendlist->list = realloc(user1->friendlist->list, sizeof(user)*user1->friendlist->size+1);
-        user1->friendlist->list[user1->friendlist->size] = friend;
+        user1->friendlist->list[user1->friendlist->size] = newfriend;
         user1->friendlist->size+=1;
     }
-    erase_freq(user1->freqlist, friend);
+    erase_freq(user1->freqlist, newfriend);
 }
 
 void erase_freq(userlist* freqs, user* u){
