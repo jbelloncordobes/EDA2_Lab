@@ -72,14 +72,16 @@ void read_users_csv(nodelist *nlist){
             value = strtok(NULL, ",");
             column++;
         }
+        u->friendlist = NULL;
+        //u->friendlist->size = 0;
+        u->sentfreq = malloc(sizeof(user));
+        u->sentfreq->size = 0;
+        u->receivedfreq = malloc(sizeof(user));
+        u->receivedfreq->size = 0;
         addUser(nlist, u);
 
     }
     fclose(fp);
-    //fopendkamkd
-    //fsacnf
-    //createuserparams(fwwwd,dkwkwk,ddldlwwl,dlddldll)
-    //adduser()
 }
 
 void write_users_csv(nodelist *nlist){

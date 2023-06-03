@@ -101,8 +101,12 @@ user* createUser(){
         printf("%d:\n", i+1);
         scanf("%s", newuser->hobbies[i]);
     }
-
-
+    newuser->friendlist = malloc(sizeof(user));
+    newuser->friendlist->size = 0;
+    newuser->sentfreq = malloc(sizeof(user));
+    newuser->sentfreq->size = 0;
+    newuser->receivedfreq = malloc(sizeof(user));
+    newuser->receivedfreq->size = 0;
 
     printf("\nUsuario Creado\n");
     return newuser;
@@ -161,7 +165,6 @@ void eraseUser(nodelist *nlist, char* name){
     printf("\n");
 }*/
 
-
 void listUsers(nodelist* nlist){
     printf("Estos son todos los usuarios: \n");
     unode *n = nlist->first;
@@ -173,8 +176,15 @@ void listUsers(nodelist* nlist){
 }
 
 void send_friend_req(user* sender, user* receiver){
-    //Si en la lista de friendrequests del sender ya está el receiver, entonces printf para avisar.
-    //En cualquier otro caso, añadir el sender a la friendrequest list del receiver y notificar al sender con un printf.
+    //Si en la lista de sent friend requests del sender ya está el receiver, entonces printf para avisar y return.
+    //En cualquier otro caso, añadir el receiver a la sent friend request list.
+    // y notificar al sender con un printf.
+}
+
+void receive_friend_req(user* sender, user* receiver){
+    //Si en la lista de sent friend requests del sender ya está el receiver, entonces printf para avisar y return.
+    //En cualquier otro caso, añadir el sender a la received friend request list del receiver.
+    // y notificar al sender con un printf.
 }
 
 void confirm_friend(user* sender, user* receiver){
@@ -184,7 +194,8 @@ void confirm_friend(user* sender, user* receiver){
 
 void add_friend(user* user1, user* newfriend){
     if (user1->friendlist == NULL){
-        user1->friendlist = malloc(sizeof(user));
+        user1->friendlist = malloc(sizeof(userlist));
+        user1->friendlist->list = malloc(sizeof(user));
         user1->friendlist->list[0] = newfriend;
         user1->friendlist->size = 1;
     }
@@ -193,10 +204,12 @@ void add_friend(user* user1, user* newfriend){
         user1->friendlist->list[user1->friendlist->size] = newfriend;
         user1->friendlist->size+=1;
     }
-    erase_freq(user1->freqlist, newfriend);
+    erase_freq(user1->sentfreq, newfriend);
+    erase_freq(newfriend->receivedfreq, user1);
 }
 
 void erase_freq(userlist* freqs, user* u){
+    if (freqs == NULL) return;
     for (int i = 0; i<freqs->size; i++){
         if (freqs->list[i] == u){
             free(freqs->list[i]);
