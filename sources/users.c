@@ -13,8 +13,8 @@ struct tm getCurrentDate() {
     return currentdate;
 }
 
-void addUser(nodelist *nlist, user *newuser) {
-    unode *n = malloc(sizeof(unode));
+void addUser(UserList *nlist, user *newuser) {
+    UserNode *n = malloc(sizeof(UserNode));
     n->User = newuser;
     if (nlist->first == NULL) {
         nlist->first = n;
@@ -25,12 +25,12 @@ void addUser(nodelist *nlist, user *newuser) {
     n->next = NULL;
 }
 
-user* getUser(nodelist nlist, wchar_t usernameid[]) {
+user* getUser(UserList nlist, wchar_t usernameid[]) {
     wchar_t username[MAX_LENGTH];
     int id = -1;
     swscanf(usernameid, L"%[^#]#%d", username, &id);
 
-    unode *curruser = nlist.first;
+    UserNode *curruser = nlist.first;
     for (int i = 0; i < nlist.size; i++) {
         if (curruser->User->id == id) {
             return curruser->User;
@@ -43,11 +43,11 @@ user* getUser(nodelist nlist, wchar_t usernameid[]) {
 
 
 
-void operateAs(HWND hwnd, nodelist users) {
+void operateAs(HWND hwnd, UserList users) {
     HWND windowH = CreateWindowExW(0, L"DialogWindow", L"Choose a user", WS_VISIBLE | WS_OVERLAPPEDWINDOW,
                                    CW_USEDEFAULT, CW_USEDEFAULT, 248, 480, hwnd, NULL, NULL, NULL);
 
-    unode *curruser = users.first;
+    UserNode *curruser = users.first;
     wchar_t name[MAX_LENGTH + 5];
     wchar_t character = '#';
 
@@ -63,11 +63,11 @@ void operateAs(HWND hwnd, nodelist users) {
     }
 }
 
-void sendFRModal(HWND hwnd, nodelist users, user active_user) {
+void sendFRModal(HWND hwnd, UserList users, user active_user) {
     HWND windowH = CreateWindowExW(0, L"DialogWindow", L"Enviar solicitud de amistad", WS_VISIBLE | WS_OVERLAPPEDWINDOW,
                                    CW_USEDEFAULT, CW_USEDEFAULT, 248, 480, hwnd, NULL, NULL, NULL);
 
-    unode *curruser = users.first;
+    UserNode *curruser = users.first;
     wchar_t name[MAX_LENGTH + 5];
     wchar_t character = '#';
 

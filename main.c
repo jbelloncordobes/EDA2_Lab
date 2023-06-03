@@ -15,6 +15,7 @@
 #include "headers/user_arrays.h"
 #include "headers/PostQueue.h"
 #include "headers/posts.h"
+#include "headers/WordDictionary.h"
 
 #pragma comment(lib, "User32.lib")
 
@@ -47,9 +48,9 @@ int friends_length;
 HWND hFriends;
 
 // Users management
+UserList users;
+WDict WordDictionary;
 
-nodelist users;
-//HWND* hUsers;
 
 // wWinMain is the name of the program entry point when using Windows.h. The w before any string or function means
 // the string is encoded using UTF-16 or the function encodes the parameters using UTF-16 instead of ANSI
@@ -190,6 +191,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             hMessageBox = NULL;
             w_width = CW_USEDEFAULT;
             w_height = CW_USEDEFAULT;
+            initDict(&WordDictionary, 10000);
             // Leer csvs cuando estén
 
             AddMenu(hwnd);
@@ -282,10 +284,10 @@ void LoadWindow(HWND hwnd) {
     // Parte central - chat
     HWND chat;
     if (active_user == NULL){
-        chat = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 2*width_unit, 0, 8 * width_unit,
+        chat = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | ES_READONLY | ES_MULTILINE | ES_AUTOVSCROLL, 2*width_unit, 0, 8 * width_unit,
                                     (7*w_height)/8, hwnd, NULL, NULL, NULL);
     } else {
-        chat = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 2*width_unit, 0, 8 * width_unit,
+        chat = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | ES_READONLY | ES_MULTILINE | ES_AUTOVSCROLL, 2*width_unit, 0, 8 * width_unit,
                                (7*w_height)/8, hwnd, NULL, NULL, NULL);
 
         wchar_t existing_text[TEXT_LENGTH];
@@ -295,7 +297,7 @@ void LoadWindow(HWND hwnd) {
         while(currpost != NULL){
             GetWindowTextW(chat, existing_text, TEXT_LENGTH);
             wcscat(existing_text, currpost->message);
-            wcscat(existing_text, L"\n------------------------\n");
+            wcscat(existing_text, L"\r\n------------------------\r\n");
             SetWindowTextW(chat, existing_text);
             currpost = dequeue(&active_user->posts);
         }
@@ -347,7 +349,7 @@ void LoadWindow(HWND hwnd) {
     addHandle(AppStack, friend_requests_sent);
 
     // La lista de usuarios
-    unode *curruser = users.first;
+    UserNode *curruser = users.first;
     wchar_t name[MAX_LENGTH+5];
     wchar_t character = '#';
     int id;
@@ -702,8 +704,6 @@ int createUser(HWND hwnd) {
     wchar_t hobby3[MAX_LENGTH];
     wchar_t hobby4[MAX_LENGTH];
     wchar_t hobby5[MAX_LENGTH];
-    // Gusto1,Gusto2,Gusto3,Gusto4,Gusto5
-    // Espacio en blanco entre Gusto1 y Gusto2?
     int source = swscanf_s(hobbies, L"%[^,],%[^,],%[^,],%[^,],%[^\0]", hobby1, MAX_LENGTH, hobby2, MAX_LENGTH, hobby3, MAX_LENGTH, hobby4, MAX_LENGTH, hobby5, MAX_LENGTH);
     if (source < 5) {
         MessageBox(hwnd, L"Formato de gustos incorrecto/Menos de 5 gustos introducidos", L"Information", MB_OK);
@@ -732,7 +732,7 @@ int createUser(HWND hwnd) {
     initQueue(&newuser->posts);
 
     addUser(&users, newuser);
-    unode *newnode = malloc(sizeof(unode));
+    UserNode *newnode = malloc(sizeof(UserNode));
     newnode->User = newuser;
 
     serial += 1;
@@ -754,6 +754,8 @@ void sendMessage(HWND hwnd){
     wchar_t messageboxText[POST_LENGTH] = L"";
     GetWindowTextW(hMessageBox, messageboxText ,POST_LENGTH);
 
+
+
     // Mensaje vacío
     if (wcscmp(messageboxText, L"") == 0){
         return;
@@ -761,6 +763,30 @@ void sendMessage(HWND hwnd){
     Post* newpost = createPost(messageboxText);
     addToQueue(&active_user->posts, newpost);
     SetWindowTextW(hMessageBox, L"");
+
+    // wchar_t buffer[MAX_WORD_LENGTH];
+    // wcscpy(buffer, wcstok(messageboxText, (const wchar_t *) L" "));
+
+//    wchar_t* buffer;
+//    wchar_t* token = wcstok_s(messageboxText, (const wchar_t *) L" ", &buffer);
+
+    wchar_t* token = wcstok(messageboxText, (const wchar_t *) L"\t\r\n\v\f ");
+    DictNode* currnode;
+
+    while (token != NULL) {
+        //wcscpy(buffer, wcstok(NULL, (const wchar_t *) L" "));
+        currnode = searchDict(&WordDictionary, token);
+        if (currnode == NULL){
+            wprintf(L"Word doesn't exist %ls\n", token);
+            addToDict(&WordDictionary, token);
+        } else {
+            wprintf(L"Word does exist %ls\n", token);
+            currnode->count += 1;
+        }
+        token = wcstok(NULL, (const wchar_t *) L"\t\r\n\v\f ");
+        //token = wcstok_s(NULL, (const wchar_t *) L" ", &buffer);
+    }
+
     LoadWindow(mainWindow);
 }
 

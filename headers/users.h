@@ -14,7 +14,7 @@
 #define MAX_HOBBIES 5
 
 // Structs
-// user_array se define aquí porque da problemas para leerlo bien en su header
+// muchas estructuras se definen aquí porque dan problemas para leerlas bien en sus headers
 typedef struct user_array{
     struct user** users;
     int size;
@@ -45,24 +45,24 @@ typedef struct user{
     PostQueue posts;
 } user;
 
-typedef struct Node{
+typedef struct UserNode{
     user *User;
-    struct Node *next;
-} unode;
+    struct UserNode *next;
+} UserNode;
 
-typedef struct NodeList{
-    unode *first;
-    unode *last;
+typedef struct UserList{
+    UserNode *first;
+    UserNode *last;
     int size;
-} nodelist;
+} UserList;
 
 // Forward Declarations
 struct tm getCurrentDate();
-user* getUser(nodelist, wchar_t[]);
-void operateAs(HWND, nodelist);
-void addUser(nodelist*, user*);
+user* getUser(UserList, wchar_t[]);
+void operateAs(HWND, UserList);
+void addUser(UserList*, user*);
 
-void sendFRModal(HWND hwnd, nodelist, user);
+void sendFRModal(HWND hwnd, UserList, user);
 void receivedFRModal(HWND hwnd, user*);
 void sentFRModal(HWND hwnd, user*);
 #endif //EDA2_LAB_USERS_H
