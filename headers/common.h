@@ -29,7 +29,7 @@
 
 #define TRUE 1
 #define FALSE 0
-#define TEXT_LENGTH 1000
+#define TEXT_LENGTH 10000
 
 #include <Windows.h>
 // Forward declarations

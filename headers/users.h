@@ -10,7 +10,7 @@
 
 // Definitions
 #define MAX_LENGTH 100
-#define POST_LENGTH 250
+#define POST_LENGTH 500
 #define MAX_HOBBIES 5
 
 // Structs
