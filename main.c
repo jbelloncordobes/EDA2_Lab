@@ -13,13 +13,14 @@
 #include "headers/common.h"
 #include "headers/users.h"
 #include "headers/user_arrays.h"
+#include "headers/PostQueue.h"
+#include "headers/posts.h"
 
 #pragma comment(lib, "User32.lib")
 
 
 // Global Handles
 HWND mainWindow;
-
 HWND hFormUsername;
 HWND hFormBirthday;
 HWND hFormEmail;
@@ -79,8 +80,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     RegisterClassW(&wc);
     registerFormClass(hInstance);
 
-//    HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-
     // Creating the window. Returns the handle to the new window or NULL if it can't be created
     HWND hwnd = CreateWindowExW(
             // Optional styles (ie transparent window)
@@ -131,7 +130,28 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 case MENU_NEW_USER:
                     displayForm(hwnd);
                     break;
-                case CHANGE_USER:
+                case USER_DETAILS:
+                    if (active_user == NULL){
+                        MessageBoxW(hwnd, L"No se está operando como ningún usuario", L"Usuario no seleccionado", MB_ICONEXCLAMATION);
+                        break;
+                    }
+                    userDetails(mainWindow);
+                    break;
+                case POST_MESSAGE:
+                    if (active_user == NULL){
+                        break;
+                    } else {
+//                        wchar_t posttext[POST_LENGTH];
+//                        GetWindowTextW(hMessageBox, posttext, POST_LENGTH);
+//                        Post* newpost = createPost(posttext);
+//                        addToQueue(&active_user->posts, newpost);
+//                        SetWindowTextW(hMessageBox, L"");
+//                        // RedrawWindow(NULL, NULL, NULL, RDW_UPDATENOW);
+//                        LoadWindow(mainWindow);
+                        sendMessage(mainWindow);
+                    }
+                    break;
+                case MENU_CHANGE_USER:
                     operateAs(hwnd, users);
                     break;
                 case OPEN_SEND_FR:
@@ -167,15 +187,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             users.first = NULL;
             users.last = NULL;
             users.size = 0;
+            hMessageBox = NULL;
             w_width = CW_USEDEFAULT;
             w_height = CW_USEDEFAULT;
+            // Leer csvs cuando estén
 
             AddMenu(hwnd);
             return 0;
         case WM_CLOSE:
             // if (MessageBox(hwnd, L"Really quit?", L"My application", MB_OKCANCEL) == IDOK)
         {
-            printf("Closing");
             DestroyWindow(hwnd);
         }
             // Else: User canceled. Do nothing.
@@ -192,8 +213,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             w_height = height;
 
             LoadWindow(hwnd);
-
-//            OnSize(hwnd, (UINT) wParam, width, height);
             return 0;
         }
         case WM_PAINT:
@@ -229,11 +248,17 @@ void AddMenu(HWND hwnd) {
 
     // Users Menu
     AppendMenuW(hMenuUsers, MF_STRING, MENU_NEW_USER, L"Añadir Usuario");
+    AppendMenuW(hMenuUsers, MF_STRING, MENU_CHANGE_USER, L"Operar como usuario");
 
     SetMenu(hwnd, hMenu);
 }
 
 void LoadWindow(HWND hwnd) {
+    // Guarda el texto que haya escrito el usuario
+    wchar_t messageboxText[POST_LENGTH] = L"";
+    if (hMessageBox != NULL){
+        GetWindowTextW(hMessageBox, messageboxText ,POST_LENGTH);
+    }
 
     // Destruye las ventanas del stack (toda la pantalla) para recargarlas en su nueva posición.
     HWND currWindow = popHandle(AppStack);
@@ -246,9 +271,8 @@ void LoadWindow(HWND hwnd) {
     int height_unit = ((w_height) / 24);
 
     // Separadores
-//    HWND separator1 = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 0, 0, 2 * width_unit, 700,
-//                                      hwnd, NULL, NULL, NULL);
-    HWND separator1 = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 0, 0, 2 * width_unit, w_height,
+
+    HWND separator1 = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER , 0, 0, 2 * width_unit, w_height,
                                       hwnd, NULL, NULL, NULL);
     HWND separator2 = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 2 * width_unit, 0,
                                       8 * width_unit, w_height, hwnd, NULL, NULL, NULL);
@@ -256,16 +280,42 @@ void LoadWindow(HWND hwnd) {
                                       2 * width_unit, w_height, hwnd, NULL, NULL, NULL);
 
     // Parte central - chat
-    HWND chat = CreateWindowExW(0, L"static", L"Chat vacío", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 2*width_unit, 0, 8 * width_unit,
-                                (7*w_height)/8, hwnd, NULL, NULL, NULL);
-    HWND messagebox = CreateWindowExW(0, L"edit", L"Selecciona un chat y escribe un mensaje",
-                            WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_LEFT, 2 * width_unit, (7*w_height)/8, 8 * width_unit, (w_height/8)-2, hwnd,
+    HWND chat;
+    if (active_user == NULL){
+        chat = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 2*width_unit, 0, 8 * width_unit,
+                                    (7*w_height)/8, hwnd, NULL, NULL, NULL);
+    } else {
+        chat = CreateWindowExW(0, L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL, 2*width_unit, 0, 8 * width_unit,
+                               (7*w_height)/8, hwnd, NULL, NULL, NULL);
+
+        wchar_t existing_text[TEXT_LENGTH];
+
+        resetQueue(&active_user->posts);
+        Post* currpost = dequeue(&active_user->posts);
+        while(currpost != NULL){
+            GetWindowTextW(chat, existing_text, TEXT_LENGTH);
+            wcscat(existing_text, currpost->message);
+            wcscat(existing_text, L"\n------------------------\n");
+            SetWindowTextW(chat, existing_text);
+            currpost = dequeue(&active_user->posts);
+        }
+    }
+
+
+    hMessageBox = CreateWindowExW(0, L"edit", messageboxText,
+                            WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_LEFT, 2 * width_unit, (7*w_height)/8, 6 * width_unit, (w_height/8)-2, hwnd,
                             NULL, NULL, NULL);
 
+    HWND messagebox_button = CreateWindowExW(0, L"Button", L"Send",
+                                      WS_VISIBLE | WS_CHILD , (2 * width_unit) + (6 * width_unit) + width_unit/3, (7*w_height)/8 + w_height/32, width_unit, (w_height/16)-2, hwnd,
+                                      (HMENU) POST_MESSAGE, NULL, NULL);
 
-    // Botón parte derecha (Operar como)
-    HWND operateas = CreateWindowExW(0, L"Button", L"Operar como", WS_VISIBLE | WS_CHILD, (10 * width_unit) + ((2 * width_unit) / 6), 24,
-                    (2 * (2 * width_unit)) / 3, 30, hwnd, (HMENU) CHANGE_USER, NULL, NULL);
+
+    // Botón parte derecha (-)
+//    HWND operateas = CreateWindowExW(0, L"Button", L"Operar como", WS_VISIBLE | WS_CHILD, (10 * width_unit) + ((2 * width_unit) / 6), 24,
+//                    (2 * (2 * width_unit)) / 3, 30, hwnd, (HMENU) CHANGE_USER, NULL, NULL);
+    HWND operateas = CreateWindowExW(0, L"Button", L"Ver detalles", WS_VISIBLE | WS_CHILD, (10 * width_unit) + ((2 * width_unit) / 6), 24,
+                                     (2 * (2 * width_unit)) / 3, 30, hwnd, (HMENU) USER_DETAILS, NULL, NULL);
 
     // Botón parte derecha (Agregar amigos)
     HWND add_friends = CreateWindowExW(0, L"Button", L"Agregar amigos", WS_VISIBLE | WS_CHILD, (10 * width_unit) + ((2 * width_unit) / 6), 24+30+12,
@@ -288,7 +338,8 @@ void LoadWindow(HWND hwnd) {
     addHandle(AppStack, separator2);
     addHandle(AppStack, separator3);
     addHandle(AppStack, chat);
-    addHandle(AppStack, messagebox);
+    addHandle(AppStack, hMessageBox);
+    addHandle(AppStack, messagebox_button);
     addHandle(AppStack, users_title);
     addHandle(AppStack, operateas);
     addHandle(AppStack, add_friends);
@@ -318,13 +369,12 @@ void LoadWindow(HWND hwnd) {
 
         HWND user = CreateWindowExW(0, L"static", name, WS_VISIBLE | WS_CHILD | SS_CENTER,
                             2, 36 + i * 16 + i * 4, (2 * width_unit) - 16, 16, hwnd,
-                        (HMENU) OPEN_CHAT, NULL, NULL);
+                            NULL, NULL, NULL);
         addHandle(AppStack, user);
         curruser = curruser->next;
         i++;
     }
     int final_elements = i + 1;
-    // printf("%d\n", final_elements);
 
     // Título parte izquierda (amigos)
     HWND friends_title = CreateWindowExW(0, L"static", L"Amigos", WS_VISIBLE | WS_CHILD | SS_CENTER, 2, 36 + 8 + final_elements * 16 + final_elements * 4,
@@ -352,7 +402,7 @@ void LoadWindow(HWND hwnd) {
 
 }
 
-// // Defines the function that processes messages sent to the dialog (secondary) window
+// Defines the function that processes messages sent to the dialog (secondary) window
 LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     switch (msg) {
         case WM_COMMAND:
@@ -433,14 +483,6 @@ LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                     DestroyWindow(hwnd);
                 }
                 break;
-                case DENY_FR:{
-
-                }
-                break;
-                case CANCEL:{
-
-                }
-                break;
             }
             break;
         case WM_CLOSE:
@@ -487,30 +529,30 @@ void displayForm(HWND hwnd) {
     int Twidth = 200;
 
     // Username
-    CreateWindowExW(0, L"static", L"Nombre de Usuario", WS_VISIBLE | WS_CHILD | SS_CENTER, paddingx, paddingl, Lwidth,
+    CreateWindowExW(0, L"static", L"Nombre de Usuario", WS_VISIBLE | WS_CHILD | SS_CENTER , paddingx, paddingl, Lwidth,
                     Lheight, windowH, NULL, NULL, NULL);
-    hFormUsername = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | SS_CENTER,
+    hFormUsername = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | SS_CENTER | ES_AUTOHSCROLL,
                                     paddingx, paddingl + Lheight, Twidth, Theight, windowH, NULL, NULL, NULL);
 
     // Email
     CreateWindowExW(0, L"static", L"Email", WS_VISIBLE | WS_CHILD | SS_CENTER, paddingx + Lwidth + marginsides,
                     paddingl, Lwidth, Lheight, windowH, NULL, NULL, NULL);
-    hFormEmail = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | SS_CENTER,
+    hFormEmail = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | SS_CENTER | ES_AUTOHSCROLL,
                                  paddingx + Lwidth + marginsides, paddingl + Lheight, Twidth, Theight, windowH, NULL,
                                  NULL, NULL);
 
     // Location
     CreateWindowExW(0, L"static", L"Ubicación", WS_VISIBLE | WS_CHILD | SS_CENTER, paddingx,
                     paddingl + Lheight + Theight + marginline, Lwidth, Lheight, windowH, NULL, NULL, NULL);
-    hFormLocation = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | SS_CENTER,
+    hFormLocation = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | SS_CENTER | ES_AUTOHSCROLL,
                                     paddingx, paddingl + (Lheight * 2) + Theight + marginline, Twidth, Theight, windowH,
                                     NULL, NULL, NULL);
 
     // Birthday
-    CreateWindowExW(0, L"static", L"Cumpleaños (DD/MM/YYYY)", WS_VISIBLE | WS_CHILD | SS_CENTER,
+    CreateWindowExW(0, L"static", L"Cumpleaños (DD/MM/YYYY)", WS_VISIBLE | WS_CHILD | SS_CENTER | ES_AUTOHSCROLL,
                     paddingx + Lwidth + marginsides, paddingl + Lheight + Theight + marginline, Lwidth, Lheight,
                     windowH, NULL, NULL, NULL);
-    hFormBirthday = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | SS_CENTER,
+    hFormBirthday = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | SS_CENTER,
                                     paddingx + Lwidth + marginsides, paddingl + Lheight * 2 + Theight + marginline,
                                     Twidth, Theight, windowH, NULL, NULL, NULL);
 
@@ -518,7 +560,7 @@ void displayForm(HWND hwnd) {
     CreateWindowExW(0, L"static", L"Gustos (Gusto1,Gusto2,...,Gusto5)", WS_VISIBLE | WS_CHILD | SS_CENTER, paddingx,
                     paddingl + Lheight * 2 + Theight * 2 + marginline * 2, Lwidth * 2 + marginsides, Lheight, windowH,
                     NULL, NULL, NULL);
-    hFormHobbies = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | SS_CENTER,
+    hFormHobbies = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | ES_MULTILINE | SS_CENTER,
                                    paddingx, paddingl + Lheight * 3 + Theight * 2 + marginline * 2,
                                    Lwidth * 2 + marginsides, Theight * 2, windowH, NULL, NULL, NULL);
 
@@ -526,6 +568,72 @@ void displayForm(HWND hwnd) {
     CreateWindowExW(0, L"button", L"Crear", WS_VISIBLE | WS_CHILD | SS_CENTER, window_width / 2 - 100,
                     paddingl + Lheight * 3 + Theight * 4 + marginline * 4, 200, 24, windowH, (HMENU) BUTTON_CREATE_USER,
                     NULL, NULL);
+}
+
+void userDetails(HWND hwnd){
+    int window_width = 460;
+    int window_height = 400;
+    HWND windowH = CreateWindowExW(0, L"DialogWindow", L"Detalles del Usuario", WS_VISIBLE | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
+                                   CW_USEDEFAULT, window_width, window_height, hwnd, NULL, NULL, NULL);
+
+    int paddingx = 24;
+    int paddingl = 24;
+
+    int marginsides = 12;
+    int marginline = 16;
+
+    int Lheight = 16;
+    int Lwidth = 200;
+
+    int Theight = 40;
+    int Twidth = 200;
+
+    // Username
+    CreateWindowExW(0, L"static", L"Nombre de Usuario", WS_VISIBLE | WS_CHILD | SS_CENTER, paddingx, paddingl, Lwidth,
+                    Lheight, windowH, NULL, NULL, NULL);
+    CreateWindowExW(0, L"static", active_user->username, WS_VISIBLE | WS_CHILD | SS_CENTER,
+                                    paddingx, paddingl + Lheight, Twidth, Theight, windowH, NULL, NULL, NULL);
+
+    // Email
+    CreateWindowExW(0, L"static", L"Email", WS_VISIBLE | WS_CHILD | SS_CENTER, paddingx + Lwidth + marginsides,
+                    paddingl, Lwidth, Lheight, windowH, NULL, NULL, NULL);
+    CreateWindowExW(0, L"static", active_user->email, WS_VISIBLE | WS_CHILD | SS_CENTER,
+                                 paddingx + Lwidth + marginsides, paddingl + Lheight, Twidth, Theight, windowH, NULL,
+                                 NULL, NULL);
+
+    // Location
+    CreateWindowExW(0, L"static", L"Ubicación", WS_VISIBLE | WS_CHILD | SS_CENTER, paddingx,
+                    paddingl + Lheight + Theight + marginline, Lwidth, Lheight, windowH, NULL, NULL, NULL);
+    CreateWindowExW(0, L"static", active_user->location, WS_VISIBLE | WS_CHILD | SS_CENTER,
+                                    paddingx, paddingl + (Lheight * 2) + Theight + marginline, Twidth, Theight, windowH,
+                                    NULL, NULL, NULL);
+
+    // Birthday
+    CreateWindowExW(0, L"static", L"Cumpleaños", WS_VISIBLE | WS_CHILD | SS_CENTER,
+                    paddingx + Lwidth + marginsides, paddingl + Lheight + Theight + marginline, Lwidth, Lheight,
+                    windowH, NULL, NULL, NULL);
+    CreateWindowExW(0, L"static", active_user->birthday, WS_VISIBLE | WS_CHILD | SS_CENTER,
+                                    paddingx + Lwidth + marginsides, paddingl + Lheight * 2 + Theight + marginline,
+                                    Twidth, Theight, windowH, NULL, NULL, NULL);
+
+    //Hobbies
+    CreateWindowExW(0, L"static", L"Gustos", WS_VISIBLE | WS_CHILD | SS_CENTER, paddingx,
+                    paddingl + Lheight * 2 + Theight * 2 + marginline * 2, Lwidth * 2 + marginsides, Lheight, windowH,
+                    NULL, NULL, NULL);
+    wchar_t hobbies[MAX_HOBBIES*MAX_LENGTH+4];
+    hobbies[0] = 0;
+    for (int i = 0; i < 5; i++){
+        wcscat(hobbies, active_user->hobbies[i]);
+        if (i == 4){
+            break;
+        }
+        wcscat(hobbies, L"\n");
+    }
+
+    CreateWindowExW(0, L"static", hobbies, WS_VISIBLE | WS_CHILD | SS_CENTER,
+                                   paddingx, paddingl + Lheight * 3 + Theight * 2 + marginline * 2,
+                                   Lwidth * 2 + marginsides, Theight * 2, windowH, NULL, NULL, NULL);
+
 }
 
 // Checks the form and creates the user
@@ -594,13 +702,14 @@ int createUser(HWND hwnd) {
     wchar_t hobby3[MAX_LENGTH];
     wchar_t hobby4[MAX_LENGTH];
     wchar_t hobby5[MAX_LENGTH];
-    int source = swscanf(hobbies, L"%[^,],%[^,],%[^,],%[^,],%[^,]", hobby1, hobby2, hobby3, hobby4, hobby5);
+    // Gusto1,Gusto2,Gusto3,Gusto4,Gusto5
+    // Espacio en blanco entre Gusto1 y Gusto2?
+    int source = swscanf_s(hobbies, L"%[^,],%[^,],%[^,],%[^,],%[^\0]", hobby1, MAX_LENGTH, hobby2, MAX_LENGTH, hobby3, MAX_LENGTH, hobby4, MAX_LENGTH, hobby5, MAX_LENGTH);
     if (source < 5) {
         MessageBox(hwnd, L"Formato de gustos incorrecto/Menos de 5 gustos introducidos", L"Information", MB_OK);
         return FALSE;
     }
     user *newuser = malloc(sizeof(user));
-
 
     newuser->id = serial;
     wcscpy(newuser->username, (const wchar_t *) &username);
@@ -620,6 +729,7 @@ int createUser(HWND hwnd) {
     newuser->friend_requests_received.users = NULL;
     newuser->friends.size = 0;
     newuser->friends.users = NULL;
+    initQueue(&newuser->posts);
 
     addUser(&users, newuser);
     unode *newnode = malloc(sizeof(unode));
@@ -632,3 +742,42 @@ int createUser(HWND hwnd) {
 
     return TRUE;
 }
+
+
+// Crea un Post y lo agrega a la cola del usuario
+void sendMessage(HWND hwnd){
+    // Usuario no seleccionado
+    if (active_user==NULL){
+        return;
+    }
+
+    wchar_t messageboxText[POST_LENGTH] = L"";
+    GetWindowTextW(hMessageBox, messageboxText ,POST_LENGTH);
+
+    // Mensaje vacío
+    if (wcscmp(messageboxText, L"") == 0){
+        return;
+    }
+    Post* newpost = createPost(messageboxText);
+    addToQueue(&active_user->posts, newpost);
+    SetWindowTextW(hMessageBox, L"");
+    LoadWindow(mainWindow);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

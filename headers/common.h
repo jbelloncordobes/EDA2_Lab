@@ -8,8 +8,9 @@
 // Definitions
 // Acciones de la pantalla principal
 #define MENU_NEW_USER 1
-#define CHANGE_USER 4
-#define OPEN_CHAT 3
+#define USER_DETAILS 2
+#define MENU_CHANGE_USER 4
+#define POST_MESSAGE 3
 #define OPEN_SEND_FR 5
 #define OPEN_RECEIVED_FR 6
 #define OPEN_SENT_FR 7
@@ -28,7 +29,9 @@
 
 #define TRUE 1
 #define FALSE 0
+#define TEXT_LENGTH 1000
 
+#include <Windows.h>
 // Forward declarations
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
@@ -38,7 +41,8 @@ void AddMenu(HWND hwnd);
 void LoadWindow(HWND hwnd);
 void registerFormClass(HINSTANCE hInstance);
 int createUser(HWND hwnd);
-
+void sendMessage(HWND hwnd);
+void userDetails(HWND hwnd);
 
 
 

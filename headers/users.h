@@ -10,6 +10,7 @@
 
 // Definitions
 #define MAX_LENGTH 100
+#define POST_LENGTH 250
 #define MAX_HOBBIES 5
 
 // Structs
@@ -19,6 +20,18 @@ typedef struct user_array{
     int size;
 }user_array;
 
+typedef struct Post{
+    wchar_t message[POST_LENGTH];
+    struct Post* next;
+}Post;
+
+// PostQueue se define aquí porque da problemas para leerlo bien en su header
+typedef struct PostQueue{
+    Post* first;
+    Post* last;
+    int current;
+}PostQueue;
+
 typedef struct user{
     int id;
     wchar_t username[MAX_LENGTH];
@@ -26,12 +39,11 @@ typedef struct user{
     wchar_t email[MAX_LENGTH];
     wchar_t location[MAX_LENGTH];
     wchar_t hobbies[MAX_HOBBIES][MAX_LENGTH];
-    struct user_array friend_requests_received; // Cola
-    struct user_array friend_requests_sent; // Cola
-    struct user_array friends;
+    user_array friend_requests_received; // Cola
+    user_array friend_requests_sent; // Cola
+    user_array friends;
+    PostQueue posts;
 } user;
-
-
 
 typedef struct Node{
     user *User;
