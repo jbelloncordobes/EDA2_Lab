@@ -18,17 +18,13 @@ DictNode* searchDict(WDict* Dict, wchar_t* key){
     int i = 0;
     int value = 0;
     int total = 0;
-    wprintf(L"%ls\n", key);
     while (key[i] != 0){
         value = (int) key[i];
-        // wprintf(L"Character %lc numerical value is %d\n", key[i], value);
         total += value;
         i++;
     }
-    // wprintf(L"Total: %d\n", total);
     total = total * i;
     total = (int) total % (int) Dict->size;
-    // printf(L"Total module: %d\n", total);
     // Si no encuentra la key
     while(wcscmp(key, Dict->elements[total].key) != 0){
         // Si es un elemento vacío no existe en la lista.
@@ -48,17 +44,13 @@ void addToDict(WDict* Dict, wchar_t* key){
     int i = 0;
     int value = 0;
     int total = 0;
-    // wprintf(L"%ls\n", key);
     while (key[i] != 0){
         value = (int) key[i];
-        // wprintf(L"Character %lc numerical value is %d\n", key[i], value);
         total += value;
         i++;
     }
-    // wprintf(L"Total: %d\n", total);
     total = total * i;
     total = (int) total % (int) Dict->size;
-    // wprintf(L"Total module: %d\n", total);
     while(Dict->elements[total].count != 0){
         total++;
         if (total == Dict->size){
@@ -86,10 +78,7 @@ void mergeDict(WDict* Dict, int left, int middle, int right){
     j = 0;
     k = left;
     while (i < n1 && j < n2){
-        if (L[i].count <= R[j].count){
-            //wchar_t test[40];
-            //wcscpy(test, L[i].key);
-            //int count = L[i].count;
+        if (L[i].count >= R[j].count){
             Dict->elements[k] = L[i];
             i++;
         } else {
@@ -114,7 +103,7 @@ void mergeDict(WDict* Dict, int left, int middle, int right){
 }
 
 void mergeSortDict(WDict* Dict, int left, int right){
-    if (left < right-1){
+    if (left < right){
         int middle = (left + right) / 2;
 
         mergeSortDict(Dict, left, middle);

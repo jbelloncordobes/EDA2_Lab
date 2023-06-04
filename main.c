@@ -574,7 +574,7 @@ void displayForm(HWND hwnd) {
 
 void userDetails(HWND hwnd){
     int window_width = 460;
-    int window_height = 400;
+    int window_height = 540;
     HWND windowH = CreateWindowExW(0, L"DialogWindow", L"Detalles del Usuario", WS_VISIBLE | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
                                    CW_USEDEFAULT, window_width, window_height, hwnd, NULL, NULL, NULL);
 
@@ -642,9 +642,9 @@ void userDetails(HWND hwnd){
                     paddingx, paddingl + Lheight * 4 + Theight * 4 + marginline * 3, Lwidth,
                     Lheight, windowH, NULL, NULL, NULL);
 
-    CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | ES_READONLY | ES_MULTILINE | ES_AUTOVSCROLL,
+    HWND hRanking = CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | ES_READONLY | ES_MULTILINE | ES_AUTOVSCROLL,
                     paddingx, paddingl * 2 + Lheight * 5 + Theight * 4 + marginline * 3,
-                    Lwidth * 2 + marginsides, Lheight, windowH, NULL, NULL, NULL);
+                    Lwidth * 2 + marginsides, Theight*3, windowH, NULL, NULL, NULL);
 
     WDict tempDict;
     initDict(&tempDict, WordDictionary.size);
@@ -656,19 +656,31 @@ void userDetails(HWND hwnd){
     }
 
     mergeSortDict(&tempDict, 0, WordDictionary.size-1);
-    for (int i = 0; i < WordDictionary.size; i++){
-        if (WordDictionary.elements[i].count == 0){
-            continue;
-        }
-        wprintf(L"%d: %ls - %d\n", i, WordDictionary.elements[i].key, WordDictionary.elements[i].count);
-    }
-    wprintf(L"\n");
+//    for (int i = 0; i < WordDictionary.size; i++){
+//        if (WordDictionary.elements[i].count == 0){
+//            continue;
+//        }
+//        wprintf(L"%d: %ls - %d\n", i, WordDictionary.elements[i].key, WordDictionary.elements[i].count);
+//    }
+//    wprintf(L"\n");
+    wchar_t texto[DICT_SIZE*3];
+    wchar_t countnum[5];
     for (int i = 0; i < tempDict.size; i++){
         if (tempDict.elements[i].count == 0){
-            continue;
+            break;
         }
-        wprintf(L"%d: %ls - %d\n", i, tempDict.elements[i].key, tempDict.elements[i].count);
+        // Insertar texto en la caja de texto
+        wcscat(texto, tempDict.elements[i].key);
+        wcscat(texto, L" \t- ");
+        swprintf_s(countnum, 5, L"%d", tempDict.elements[i].count);
+        //wcscat(countnum, L"\n");
+        wcscat(texto, countnum);
+        wcscat(texto, L"\r\n");
+
+//        wprintf(L"%d: %ls - %d\n", i, tempDict.elements[i].key, tempDict.elements[i].count);
     }
+    SetWindowTextW(hRanking, texto),
+    wcscpy(texto, L"");
     fflush(stdout);
 
     free(tempDict.elements);
@@ -811,17 +823,13 @@ void sendMessage(HWND hwnd){
     DictNode* currnode;
 
     while (token != NULL) {
-        //wcscpy(buffer, wcstok(NULL, (const wchar_t *) L" "));
         currnode = searchDict(&WordDictionary, token);
         if (currnode == NULL){
-            //wprintf(L"Word doesn't exist %ls\n", token);
             addToDict(&WordDictionary, token);
         } else {
-            //wprintf(L"Word does exist %ls\n", token);
             currnode->count += 1;
         }
         token = wcstok(NULL, (const wchar_t *) L"\t\r\n\v\f ");
-        //token = wcstok_s(NULL, (const wchar_t *) L" ", &buffer);
     }
 
     LoadWindow(mainWindow);

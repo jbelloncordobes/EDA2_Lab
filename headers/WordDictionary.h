@@ -7,7 +7,7 @@
 #include "users.h"
 #include "common.h"
 #define MAX_WORD_LENGTH 20
-#define DICT_SIZE 20
+#define DICT_SIZE 10000
 
 typedef struct DictNode{
     wchar_t key[MAX_WORD_LENGTH];
