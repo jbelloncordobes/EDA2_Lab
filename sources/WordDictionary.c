@@ -68,3 +68,59 @@ void addToDict(WDict* Dict, wchar_t* key){
     wcscpy(Dict->elements[total].key, key);
     Dict->elements[total].count = 1;
 }
+
+void mergeDict(WDict* Dict, int left, int middle, int right){
+    int i, j, k;
+    int n1 = middle - left + 1;
+    int n2 = right - middle;
+
+    DictNode L[n1], R[n2];
+
+    for (i = 0; i < n1; i++){
+        L[i] = Dict->elements[left + i];
+    }
+    for (j = 0; j < n2; j++){
+        R[j] = Dict->elements[middle + 1 + j];
+    }
+    i = 0;
+    j = 0;
+    k = left;
+    while (i < n1 && j < n2){
+        if (L[i].count <= R[j].count){
+            //wchar_t test[40];
+            //wcscpy(test, L[i].key);
+            //int count = L[i].count;
+            Dict->elements[k] = L[i];
+            i++;
+        } else {
+            Dict->elements[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1){
+        Dict->elements[k] = L[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2){
+        Dict->elements[k] = R[j];
+        j++;
+        k++;
+    }
+
+}
+
+void mergeSortDict(WDict* Dict, int left, int right){
+    if (left < right-1){
+        int middle = (left + right) / 2;
+
+        mergeSortDict(Dict, left, middle);
+        mergeSortDict(Dict, middle + 1, right);
+
+        mergeDict(Dict, left, middle, right);
+    }
+
+}

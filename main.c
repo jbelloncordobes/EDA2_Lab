@@ -191,7 +191,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             hMessageBox = NULL;
             w_width = CW_USEDEFAULT;
             w_height = CW_USEDEFAULT;
-            initDict(&WordDictionary, 10000);
+            initDict(&WordDictionary, DICT_SIZE);
             // Leer csvs cuando estén
 
             AddMenu(hwnd);
@@ -636,6 +636,43 @@ void userDetails(HWND hwnd){
                                    paddingx, paddingl + Lheight * 3 + Theight * 2 + marginline * 2,
                                    Lwidth * 2 + marginsides, Theight * 2, windowH, NULL, NULL, NULL);
 
+
+    // Most used words
+    CreateWindowExW(0, L"static", L"Ranking de palabras globales", WS_VISIBLE | WS_CHILD | SS_CENTER,
+                    paddingx, paddingl + Lheight * 4 + Theight * 4 + marginline * 3, Lwidth,
+                    Lheight, windowH, NULL, NULL, NULL);
+
+    CreateWindowExW(0, L"edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | ES_READONLY | ES_MULTILINE | ES_AUTOVSCROLL,
+                    paddingx, paddingl * 2 + Lheight * 5 + Theight * 4 + marginline * 3,
+                    Lwidth * 2 + marginsides, Lheight, windowH, NULL, NULL, NULL);
+
+    WDict tempDict;
+    initDict(&tempDict, WordDictionary.size);
+    for (int i = 0; i < tempDict.size; i++){
+        tempDict.elements[i].count = WordDictionary.elements[i].count;
+        if (tempDict.elements[i].count != 0){
+            wcscpy(tempDict.elements[i].key, WordDictionary.elements[i].key);
+        }
+    }
+
+    mergeSortDict(&tempDict, 0, WordDictionary.size-1);
+    for (int i = 0; i < WordDictionary.size; i++){
+        if (WordDictionary.elements[i].count == 0){
+            continue;
+        }
+        wprintf(L"%d: %ls - %d\n", i, WordDictionary.elements[i].key, WordDictionary.elements[i].count);
+    }
+    wprintf(L"\n");
+    for (int i = 0; i < tempDict.size; i++){
+        if (tempDict.elements[i].count == 0){
+            continue;
+        }
+        wprintf(L"%d: %ls - %d\n", i, tempDict.elements[i].key, tempDict.elements[i].count);
+    }
+    fflush(stdout);
+
+    free(tempDict.elements);
+
 }
 
 // Checks the form and creates the user
@@ -777,10 +814,10 @@ void sendMessage(HWND hwnd){
         //wcscpy(buffer, wcstok(NULL, (const wchar_t *) L" "));
         currnode = searchDict(&WordDictionary, token);
         if (currnode == NULL){
-            wprintf(L"Word doesn't exist %ls\n", token);
+            //wprintf(L"Word doesn't exist %ls\n", token);
             addToDict(&WordDictionary, token);
         } else {
-            wprintf(L"Word does exist %ls\n", token);
+            //wprintf(L"Word does exist %ls\n", token);
             currnode->count += 1;
         }
         token = wcstok(NULL, (const wchar_t *) L"\t\r\n\v\f ");
