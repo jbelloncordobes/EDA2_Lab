@@ -4,11 +4,7 @@
 
 #include "../headers/posts.h"
 
-//typedef struct Post{
-//    wchar_t message[POST_LENGTH];
-//    struct Post* next;
-//}Post;
-
+// Crea un Post con el texto introducido y lo devuelve
 Post* createPost(wchar_t post[POST_LENGTH]){
     Post* newpost = malloc(sizeof(Post));
     wcscpy(newpost->message, post);

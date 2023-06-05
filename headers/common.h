@@ -6,7 +6,11 @@
 #define EDA2_LAB_COMMON_H
 
 // Definitions
-// Acciones de la pantalla principal
+#define TRUE 1
+#define FALSE 0
+#define TEXT_LENGTH 1000
+
+// Acciones de la pantalla principal (Botones y menus)
 #define MENU_NEW_USER 1
 #define USER_DETAILS 2
 #define MENU_CHANGE_USER 4
@@ -15,23 +19,15 @@
 #define OPEN_RECEIVED_FR 6
 #define OPEN_SENT_FR 7
 
-// Acciones de los modals
+// Acciones de los modals (formulario de crear usuarios y ventanas secundarias de amigos y operar como)
 #define BUTTON_CREATE_USER 2
 #define SELECT_USER 5
-#define SEND_FR 7
-#define CANCEL_FR 8
-#define ACCEPT_FR 9
-#define DENY_FR 10
-#define CANCEL 11
 #define FR_BUTTON 12
 #define RFR_BUTTON 13
 #define SFR_BUTTON 14
 
-#define TRUE 1
-#define FALSE 0
-#define TEXT_LENGTH 1000
-
 #include <Windows.h>
+
 // Forward declarations
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
@@ -41,10 +37,6 @@ void AddMenu(HWND hwnd);
 void LoadWindow(HWND hwnd);
 void registerFormClass(HINSTANCE hInstance);
 int createUser(HWND hwnd);
-void sendMessage(HWND hwnd);
+void sendMessage();
 void userDetails(HWND hwnd);
-
-
-
-
 #endif //EDA2_LAB_COMMON_H

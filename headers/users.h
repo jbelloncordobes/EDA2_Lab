@@ -14,7 +14,7 @@
 #define MAX_HOBBIES 5
 
 // Structs
-// muchas estructuras se definen aquí porque dan problemas para leerlas bien en sus headers
+// muchas estructuras se definen aquí porque dan problemas para leerlas bien en los headers en los que les tocaría ir
 typedef struct user_array{
     struct user** users;
     int size;
@@ -25,11 +25,11 @@ typedef struct Post{
     struct Post* next;
 }Post;
 
-// PostQueue se define aquí porque da problemas para leerlo bien en su header
+// PostQueue es una cola
 typedef struct PostQueue{
     Post* first;
     Post* last;
-    int current;
+    int current; // Referido a menudo como "puntero" en comentarios
 }PostQueue;
 
 typedef struct user{
@@ -50,6 +50,7 @@ typedef struct UserNode{
     struct UserNode *next;
 } UserNode;
 
+// Lista de usuarios
 typedef struct UserList{
     UserNode *first;
     UserNode *last;
