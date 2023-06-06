@@ -121,7 +121,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 /// Parameters:
 /// - hwnd is the handle of the window that receives the message
 /// - uMsg is the identifier of the message sent
-/// - wParam and lParam are parameters used to send detailed information (mouse pressed, coordinates of the click, etc.)
+/// - wParam and lParam are parameters used to send detailed Información (mouse pressed, coordinates of the click, etc.)
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         // Boton pulsado
@@ -459,7 +459,7 @@ LRESULT CALLBACK DialogProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                         wchar_t text[MAX_LENGTH + 22] = L"Usuario Seleccionado: ";
                         // Avisa al usuario de sus acciones mediante un popup
                         wcscat(text, selected_user->username);
-                        MessageBox(hwnd, text, L"Information", MB_OK);
+                        MessageBox(hwnd, text, L"Información", MB_OK);
                     }
                     // Destruye la ventana de seleccion y recarga la página
                     DestroyWindow(hwnd);
@@ -779,7 +779,7 @@ int createUser(HWND hwnd) {
             break;
         }
         if (email[i] == 0) {
-            MessageBox(hwnd, L"Formato de mail incorrecto", L"Information", MB_OK);
+            MessageBox(hwnd, L"Formato de mail incorrecto", L"Información", MB_OK);
             return FALSE;
         }
     }
@@ -790,7 +790,7 @@ int createUser(HWND hwnd) {
 
     // Comprueba que sea una fecha válida
     if (swscanf(birthday, L"%d/%d/%d", &day, &month, &year) < 3) {
-        MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Information", MB_OK);
+        MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Información", MB_OK);
         return FALSE;
     }
 
@@ -798,13 +798,13 @@ int createUser(HWND hwnd) {
 
     // Comprueba que el año esté entre 1900 y el año actual - 1
     if (year > time.tm_year + 1900 || year < 1900) {
-        MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Information", MB_OK);
+        MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Información", MB_OK);
         return FALSE;
     }
 
     // Comprueba que los meses sean válidos
     if (month > 12 || month < 1) {
-        MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Information", MB_OK);
+        MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Información", MB_OK);
         return FALSE;
     }
 
@@ -812,14 +812,14 @@ int createUser(HWND hwnd) {
     if (day > 28) {
         if (month == 2) {
             if ((year % 4 && (year % 100 != 0 || year % 400 == 0)) || day > 29) {
-                MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Information", MB_OK);
+                MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Información", MB_OK);
                 return FALSE;
             }
         }
     }
     if (day == 31) {
         if (month == 2 || month == 4 || month == 6 || month == 9 || month == 11) {
-            MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Information", MB_OK);
+            MessageBox(hwnd, L"Fecha de nacimiento incorrecta", L"Información", MB_OK);
             return FALSE;
         }
     }
@@ -833,7 +833,7 @@ int createUser(HWND hwnd) {
     // Saca los gustos separados por comas menos el último, que es hasta el final de la wide string.
     int source = swscanf_s(hobbies, L"%[^,],%[^,],%[^,],%[^,],%[^\0]", hobby1, MAX_LENGTH, hobby2, MAX_LENGTH, hobby3, MAX_LENGTH, hobby4, MAX_LENGTH, hobby5, MAX_LENGTH);
     if (source < 5) {
-        MessageBox(hwnd, L"Formato de gustos incorrecto/Menos de 5 gustos introducidos", L"Information", MB_OK);
+        MessageBox(hwnd, L"Formato de gustos incorrecto/Menos de 5 gustos introducidos", L"Información", MB_OK);
         return FALSE;
     }
 
@@ -864,7 +864,7 @@ int createUser(HWND hwnd) {
     addUser(&users, newuser);
     serial += 1;
 
-    MessageBox(hwnd, L"User Created", L"Information", MB_OK);
+    MessageBox(hwnd, L"User Created", L"Información", MB_OK);
 
     return TRUE;
 }
