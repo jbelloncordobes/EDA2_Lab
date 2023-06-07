@@ -57,17 +57,17 @@ void addUser(nodelist*, user*);
 void eraseUser(nodelist*, char*);
 
 //void listUsers(user**, int);
-void listUsers(nodelist*);
+void listUsers(nodelist*, user*);
 
 
 
-//Friends
 void erase_freq(userlist*, user*);
 void add_friend(user*, user*);
 void send_friend_req(user*, user*);
-// confirm_friend(user*, user*);
+//void confirm_friend(user*, user*);
 //int is_in_duo_list(userduolist*, user*, user*);
 //void add_to_duo_list(userduolist *, userduo *);
+void list_userlist(userlist*);
 int is_in_list(userlist*, int);
 void receive_friend_req(user*, user*);
 
