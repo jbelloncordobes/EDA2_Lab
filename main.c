@@ -98,9 +98,10 @@ void menu(){
             printf("1. Anadir post (funcion no implementada)\n");
             printf("2. Enviar solicitud de amistad\n");
             printf("3. Aceptar solicitud de amistad\n");
-            printf("4. Listar amigos\n");
-            printf("5. Listar solicitudes de amistad\n");
-            printf("6. Cerrar sesion\n");
+            printf("4. Ignorar solicitud de amistad\n");
+            printf("5. Listar amigos\n");
+            printf("6. Listar solicitudes de amistad\n");
+            printf("7. Cerrar sesion\n");
 
             fgets(answer, 2, stdin);
             sscanf(answer, "%d", &decision);
@@ -145,7 +146,7 @@ void menu(){
                             printf("No tienes solicitudes de amistad!\n");
                             break;
                         }
-                        printf("Estos son tus amigos:\n");
+                        printf("Estas son tus solicitudes de amistad recibidas:\n");
                         list_userlist(active_user->receivedfreq); //List all users available.
                         printf("Escribe el nombre del usuario deseado:\n");
                         scanf("%s", answer2);
@@ -153,6 +154,7 @@ void menu(){
                             if (strcmp(currentnode->User->username, answer2) == 0){ //If current node's username coincides with input.
                                 selected = TRUE; //Desired player has been found.
                                 add_friend(currentnode->User, active_user); //Add friend from both sides.
+                                printf("Solicitud de amistad aceptada!\n");
                                 break;
                             }
                             currentnode = currentnode->next; //Go to next node to check.
@@ -160,14 +162,40 @@ void menu(){
                     }
                     break;
                 }
-                case 4: //List friends.
+                case 4:{ //Ignore friend request
+                    int selected = FALSE; //Variable to end loop.
+                    while (selected == FALSE){
+                        char answer2[MAX_LENGTH]; //Variable to store the answer.
+                        unode *currentnode = Users->first; //Create node to store the current node inspected.
+                        if(active_user->receivedfreq == NULL){ //If received friend requests list is empty.
+                            printf("No tienes solicitudes de amistad!\n");
+                            break;
+                        }
+                        printf("Estas son tus solicitudes de amistad recibidas:\n");
+                        list_userlist(active_user->receivedfreq); //List all users available.
+                        printf("Escribe el nombre del usuario deseado:\n");
+                        scanf("%s", answer2);
+                        while(currentnode!=NULL){ //Search until last nodelist item.
+                            if (strcmp(currentnode->User->username, answer2) == 0){ //If current node's username coincides with input.
+                                selected = TRUE; //Desired player has been found.
+                                erase_freq(active_user->receivedfreq, currentnode->User); //Ignore friend request from both sides.
+                                erase_freq(currentnode->User->sentfreq, active_user);
+                                printf("Solicitud de amistad ignorada >:(\n");
+                                break;
+                            }
+                            currentnode = currentnode->next; //Go to next node to check.
+                        }
+                    }
+                    break;
+                }
+                case 5: //List friends.
                     if (active_user->friendlist == NULL) printf("No tienes amigos :(\n");
                     else {
                         printf("Estos son tus amigos:\n");
                         list_userlist(active_user->friendlist);
                     }
                     break;
-                case 5: //List friend requests.
+                case 6: //List friend requests.
                     if (active_user->sentfreq == NULL) printf("No has enviado ninguna solicitud de amistad!\n");
                     else {
                         printf("Estas son tus solicitudes de amistad enviadas:\n");
@@ -179,7 +207,7 @@ void menu(){
                         list_userlist(active_user->receivedfreq);
                     }
                     break;
-                case 6: //Log out.
+                case 7: //Log out.
                     active_user = NULL;
                     break;
                 default: //Invalid option.
