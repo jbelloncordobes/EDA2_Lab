@@ -42,6 +42,10 @@ void menu(){
                     listUsers(Users, active_user); //Print every user's username.
                     break;
                 case 3: { //Operate as user.
+                    if (Users->first == NULL){
+                        printf("No hay usuarios.\n");
+                        break;
+                    }
                     int selected = FALSE; //Variable to end loop.
                     while (selected == FALSE){ //Loop.
                         char answer2[MAX_LENGTH]; //Variable to store the answer.
