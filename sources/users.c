@@ -100,6 +100,7 @@ user* createUser(){
         printf("%d:\n", i+1);
         scanf("%s", newuser->hobbies[i]);
     }
+
     newuser->friendlist = NULL;
     newuser->sentfreq = NULL;
     newuser->receivedfreq = NULL;

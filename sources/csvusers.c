@@ -12,18 +12,16 @@ void read_users_csv(nodelist *nlist){
     int column = 0;
     char buffer[1024]; //Create a string buffer for every row
     FILE *fp = fopen("../Files/users.csv", "r"); //Open the file in read mode
-    if (fp == NULL) { //In case there is no user file
+    if (!fp) { //In case there is no user file
         printf("No hay usuarios.\n");
         return;
     }
-    while (fgets(buffer, 1024, fp)){ //If there is a file
+    while (fgets(buffer, 1024, fp)) { //If there is a file
         user *u = malloc(sizeof(user));
-
         column = 0; //Starting column for each row
         row++; //Starting row of the file
         if (row == 1) continue; //If row is the first one, pass
-        char* value = strtok(buffer, ", "); //Check value
-
+        char *value = strtok(buffer, ","); //Check value
         while (value){ //While it reads something
             switch(column){
                 case 0: {
@@ -51,19 +49,20 @@ void read_users_csv(nodelist *nlist){
                     break;
                 }
                 case 6: {
-                    strcpy(u->hobbies[1], value); //Sixth column = Hobby 1.
+                    strcpy(u->hobbies[1], value); //Sixth column = Hobby 2.
                     break;
                 }
                 case 7: {
-                    strcpy(u->hobbies[2], value); //Seventh column = Hobby 1.
+                    strcpy(u->hobbies[2], value); //Seventh column = Hobby 3.
                     break;
                 }
                 case 8: {
-                    strcpy(u->hobbies[3], value); //Eighth column = Hobby 1.
+                    strcpy(u->hobbies[3], value); //Eighth column = Hobby 4.
                     break;
                 }
                 case 9: {
-                    strcpy(u->hobbies[4], value); //Nineth column = Hobby 1.
+                    if (value[strlen(value)-1] == '\n') value[strlen(value)-1] = 0;
+                    strcpy(u->hobbies[4], value); //Ninth column = Hobby 5.
                     break;
                 }
 
@@ -82,11 +81,10 @@ void read_users_csv(nodelist *nlist){
 void write_users_csv(nodelist *nlist){
     unode *n = nlist->first; //Create a node and assign it to the first one of the list.
     FILE *fp = fopen("../Files/users.csv", "w"); //Open the file.
-    fprintf(fp, "id,username,bday,email,location,h1,h2,h3,h4,h5\n"); //Print first line of the file.
+    fprintf(fp, "id,username,bday,email,location,h1,h2,h3,h4,h5"); //Print first line of the file.
     while (n!=NULL){
         user *u = n->User; //Check user info and print it on the file.
-        fprintf(fp,"");
-        fprintf(fp, "%i,%s,%s,%s,%s,%s,%s,%s,%s,%s", u->id, u->username, u->birthday, u->email, u->location, u->hobbies[0], u->hobbies[1], u->hobbies[2], u->hobbies[3], u->hobbies[4]);
+        fprintf(fp, "\n%i,%s,%s,%s,%s,%s,%s,%s,%s,%s", u->id, u->username, u->birthday, u->email, u->location, u->hobbies[0], u->hobbies[1], u->hobbies[2], u->hobbies[3], u->hobbies[4]);
         n = n->next; //Go to next node.
     }
     fclose(fp);
