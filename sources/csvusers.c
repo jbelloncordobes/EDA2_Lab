@@ -85,6 +85,7 @@ void write_users_csv(nodelist *nlist){
     fprintf(fp, "id,username,bday,email,location,h1,h2,h3,h4,h5\n"); //Print first line of the file.
     while (n!=NULL){
         user *u = n->User; //Check user info and print it on the file.
+        fprintf(fp,"");
         fprintf(fp, "%i,%s,%s,%s,%s,%s,%s,%s,%s,%s", u->id, u->username, u->birthday, u->email, u->location, u->hobbies[0], u->hobbies[1], u->hobbies[2], u->hobbies[3], u->hobbies[4]);
         n = n->next; //Go to next node.
     }

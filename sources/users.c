@@ -100,12 +100,9 @@ user* createUser(){
         printf("%d:\n", i+1);
         scanf("%s", newuser->hobbies[i]);
     }
-    newuser->friendlist = malloc(sizeof(user));
-    newuser->friendlist->size = 0;
-    newuser->sentfreq = malloc(sizeof(user));
-    newuser->sentfreq->size = 0;
-    newuser->receivedfreq = malloc(sizeof(user));
-    newuser->receivedfreq->size = 0;
+    newuser->friendlist = NULL;
+    newuser->sentfreq = NULL;
+    newuser->receivedfreq = NULL;
 
     printf("\nUsuario Creado\n");
     return newuser;
