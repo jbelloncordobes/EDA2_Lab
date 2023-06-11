@@ -10,9 +10,6 @@ int main() {
 }
 
 void menu(){
-
-
-
     int serial = 0;
     char answer[2];
     int decision;
@@ -31,9 +28,6 @@ void menu(){
             printf("3. Operar como usuario\n");
             printf("4. Eliminar usuario\n");
             printf("5. Salir\n");
-
-
-
 
             fgets(answer, 2, stdin);
             sscanf(answer, "%d", &decision);
