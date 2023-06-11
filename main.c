@@ -222,7 +222,6 @@ void menu(){
             while((c= getchar()) != '\n' && c != EOF) {}; //Clear buffer to ask for input again.
         }
 
-
     }
 }
 
