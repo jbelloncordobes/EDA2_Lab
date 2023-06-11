@@ -29,40 +29,40 @@ void read_users_csv(nodelist *nlist){
                     break;
                 }
                 case 1: {
-                    strcpy(u->username, value); //First column = username.
+                    strcpy(u->username, value); //Second column = username.
                     break;
                 }
                 case 2: {
-                    strcpy(u->birthday, value); //Second column = birthday.
+                    strcpy(u->birthday, value); //Third column = birthday.
                     break;
                 }
                 case 3: {
-                    strcpy(u->email, value); //Third column == Email.
+                    strcpy(u->email, value); //Fourth column == Email.
                     break;
                 }
                 case 4: {
-                    strcpy(u->location, value); //Fourth column = Location.
+                    strcpy(u->location, value); //Fifth column = Location.
                     break;
                 }
                 case 5: {
-                    strcpy(u->hobbies[0], value); //Fifth column = Hobby 1.
+                    strcpy(u->hobbies[0], value); //Sixth column = Hobby 1.
                     break;
                 }
                 case 6: {
-                    strcpy(u->hobbies[1], value); //Sixth column = Hobby 2.
+                    strcpy(u->hobbies[1], value); //Seventh column = Hobby 2.
                     break;
                 }
                 case 7: {
-                    strcpy(u->hobbies[2], value); //Seventh column = Hobby 3.
+                    strcpy(u->hobbies[2], value); //Eighth column = Hobby 3.
                     break;
                 }
                 case 8: {
-                    strcpy(u->hobbies[3], value); //Eighth column = Hobby 4.
+                    strcpy(u->hobbies[3], value); //Ninth column = Hobby 4.
                     break;
                 }
                 case 9: {
                     if (value[strlen(value)-1] == '\n') value[strlen(value)-1] = 0;
-                    strcpy(u->hobbies[4], value); //Ninth column = Hobby 5.
+                    strcpy(u->hobbies[4], value); //Tenth column = Hobby 5.
                     break;
                 }
 
